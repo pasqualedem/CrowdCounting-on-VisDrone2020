@@ -72,7 +72,7 @@ def logger(exp_path, exp_name, work_dir, exception):
             f.write(''.join(cfg_lines) + '\n\n\n\n')
 
 
-    copy_cur_env(work_dir, exp_path+ '/' + exp_name + '/code', exception)
+    # copy_cur_env(work_dir, exp_path+ '/' + exp_name + '/code', exception)
 
 
     return writer, log_file

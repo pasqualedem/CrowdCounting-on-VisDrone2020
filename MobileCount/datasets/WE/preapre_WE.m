@@ -1,7 +1,7 @@
 clc; clear all;
 standard_size = [576,720];
 
-RootPath = 'H:/CC_Matlab/WE';
+RootPath = 'media/DataSet/WE';
 DstPath = '../WE_blurred';
 %% Test set
 

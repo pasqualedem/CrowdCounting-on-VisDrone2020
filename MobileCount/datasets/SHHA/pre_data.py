@@ -3,19 +3,19 @@ import PIL.Image as Image
 import numpy as np
 import os
 from scipy.ndimage.filters import gaussian_filter 
-import scipy
+import scipy.spatial
 import pdb
 
 
 
-dataRoot = '/media/D/DataSet/CC/ShanghaiTech_Crowd_Detecting'
+dataRoot = '../dataset/ShanghaiTech'
 
 max_size=[1024,1024]
 
-A_train = dataRoot + '/part_A_final/Train'
-A_test = dataRoot + '/part_A_final/Test'
+A_train = dataRoot + '/part_A_final/train_data'
+A_test = dataRoot + '/part_A_final/test_data'
 
-dstRoot = '/media/D/DataSet/CC/UCF_QNRF_adpt'
+dstRoot = '../dataset/ShanghaiTech/UCF_QNRF_adpt'
 
 
 if not os.path.exists(dstRoot):
@@ -24,7 +24,7 @@ if not os.path.exists(dstRoot):
 
 def gaussian_filter_density(pts,dst_size):
     # print gt.shape
-    density = np.zeros([dst_size[1],dst_size[0]], dtype=np.float32)
+    density = np.zeros([int(dst_size[1]),int(dst_size[0])], dtype=np.float32)
     
     if pts is None:
         return density
@@ -38,7 +38,7 @@ def gaussian_filter_density(pts,dst_size):
     distances, locations = tree.query(pts, k=4)
 
     for i, pt in enumerate(pts):
-        pt2d = np.zeros([dst_size[1],dst_size[0]], dtype=np.float32)
+        pt2d = np.zeros([int(dst_size[1]),int(dst_size[0])], dtype=np.float32)
         pt2d[pt[1],pt[0]] = 1.
         if gt_count > 1:
             sigma = (distances[i][1]+distances[i][2]+distances[i][3])*0.1
@@ -62,7 +62,7 @@ def generate_den_map(img_paths,srcRoot,dstRoot,attr):
 
 
     for img_path in img_paths:
-        print img_path
+        print(img_path)
         mat = sio.loadmat(os.path.join(srcRoot,'ground_truth',img_path.replace('.jpg','.mat').replace('IMG_','GT_IMG_')))
         img= Image.open(os.path.join(srcRoot,'images',img_path))
         wd, ht = img.size
@@ -110,12 +110,12 @@ A_train_list.sort()
 A_test_list = os.listdir(A_test+'/images')
 A_test_list.sort()
 
-print 'train'
+print('train')
 
 
 generate_den_map(A_train_list,A_train,dstRoot, 'train')
 
-print 'test'
+print('test')
 
 
 generate_den_map(A_test_list,A_test,dstRoot,'test')                           

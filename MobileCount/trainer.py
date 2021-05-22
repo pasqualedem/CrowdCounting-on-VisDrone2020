@@ -63,9 +63,9 @@ class Trainer():
                 self.timer['val time'].tic()
                 if self.data_mode in ['SHHA', 'SHHB', 'QNRF', 'UCF50']:
                     self.validate_V1()
-                elif self.data_mode is 'WE':
+                elif self.data_mode == 'WE':
                     self.validate_V2()
-                elif self.data_mode is 'GCC':
+                elif self.data_mode == 'GCC':
                     self.validate_V3()
                 self.timer['val time'].toc(average=False)
                 print('val time: {:.2f}s'.format(self.timer['val time'].diff))
@@ -74,16 +74,22 @@ class Trainer():
     def train(self): # training for all datasets
         self.net.train()
         for i, data in enumerate(self.train_loader, 0):
+            print("Enumarated")
             self.timer['iter time'].tic()
             img, gt_map = data
             img = Variable(img).cuda()
             gt_map = Variable(gt_map).cuda()
+            print("img, gt")
 
             self.optimizer.zero_grad()
+            print("Grad zerod")
             pred_map = self.net(img, gt_map)
             loss = self.net.loss
+            print("Loss")
             loss.backward()
+            print("Backward")
             self.optimizer.step()
+            print("Omptimized")
 
             if (i + 1) % cfg.PRINT_FREQ == 0:
                 self.i_tb += 1
