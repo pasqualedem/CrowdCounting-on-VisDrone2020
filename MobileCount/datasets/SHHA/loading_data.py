@@ -28,15 +28,15 @@ def random_crop(img,den,dst_size):
     # print img.shape
     # print den.shape
 
-    x1 = random.randint(0, ts_wd - dst_size[1])/cfg_data.LABEL_FACTOR*cfg_data.LABEL_FACTOR
-    y1 = random.randint(0, ts_hd - dst_size[0])/cfg_data.LABEL_FACTOR*cfg_data.LABEL_FACTOR
-    x2 = x1 + dst_size[1]
-    y2 = y1 + dst_size[0]
+    x1 = int(random.randint(0, ts_wd - dst_size[1])/cfg_data.LABEL_FACTOR*cfg_data.LABEL_FACTOR)
+    y1 = int(random.randint(0, ts_hd - dst_size[0])/cfg_data.LABEL_FACTOR*cfg_data.LABEL_FACTOR)
+    x2 = int(x1 + dst_size[1])
+    y2 = int(y1 + dst_size[0])
 
-    label_x1 = x1/cfg_data.LABEL_FACTOR
-    label_y1 = y1/cfg_data.LABEL_FACTOR
-    label_x2 = x2/cfg_data.LABEL_FACTOR
-    label_y2 = y2/cfg_data.LABEL_FACTOR
+    label_x1 = int(x1/cfg_data.LABEL_FACTOR)
+    label_y1 = int(y1/cfg_data.LABEL_FACTOR)
+    label_x2 = int(x2/cfg_data.LABEL_FACTOR)
+    label_y2 = int(y2/cfg_data.LABEL_FACTOR)
 
     return img[:,y1:y2,x1:x2], den[label_y1:label_y2,label_x1:label_x2]
 
@@ -54,8 +54,8 @@ def SHHA_collate(batch):
     # @GJY 
     r"""Puts each data field into a tensor with outer dimension batch size"""
 
-    transposed = zip(*batch) # imgs and dens
-    imgs, dens = [transposed[0],transposed[1]]
+    transposed = list(zip(*batch)) # imgs and dens
+    imgs, dens = transposed[0],transposed[1]
 
 
     error_msg = "batch must contain tensors; found {}"
