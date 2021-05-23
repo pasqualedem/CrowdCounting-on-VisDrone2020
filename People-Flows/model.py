@@ -1,8 +1,8 @@
 import torch.nn as nn
 import torch
+from torch.autograd import Variable
 from torch.nn import functional as F
 from torchvision import models
-from utils import save_net,load_net
 
 class ContextualModule(nn.Module):
     def __init__(self, features, out_features=512, sizes=(1, 2, 3, 6)):
@@ -61,6 +61,39 @@ class CANNet2s(nn.Module):
         x = self.relu(x)
         return x
 
+    def predict(self, x, x_prev):
+
+        with torch.no_grad():
+            prev_flow = self(x_prev, x)
+            prev_flow_inverse = self(x, x_prev)
+
+        mask_boundry = torch.zeros(prev_flow.shape[2:])
+        mask_boundry[0, :] = 1.0
+        mask_boundry[-1, :] = 1.0
+        mask_boundry[:, 0] = 1.0
+        mask_boundry[:, -1] = 1.0
+
+        mask_boundry_cuda = mask_boundry.cuda()
+        mask_boundry_var = Variable(mask_boundry_cuda)
+
+        reconstruction_from_prev = F.pad(prev_flow[:, 0, 1:, 1:], (0, 1, 0, 1)) \
+                                   + F.pad(prev_flow[:, 1, 1:, :], (0, 0, 0, 1))\
+                                   + F.pad(prev_flow[:, 2, 1:, :-1], (1, 0, 0, 1)) \
+                                   + F.pad(prev_flow[:, 3, :, 1:], (0, 1, 0, 0))\
+                                   + prev_flow[:, 4, :, :]\
+                                   + F.pad(prev_flow[:, 5, :, :-1], (1, 0, 0, 0))\
+                                   + F.pad(prev_flow[:, 6, :-1, 1:], (0, 1, 1, 0))\
+                                   + F.pad(prev_flow[:, 7, :-1, :], (0, 0, 1, 0))\
+                                   + F.pad(prev_flow[:, 8, :-1, :-1], (1, 0, 1, 0))\
+                                   + prev_flow[:, 9, :, :] * mask_boundry_var
+
+        reconstruction_from_prev_inverse = torch.sum(prev_flow_inverse[:, :9, :, :], dim=1) \
+                                         + prev_flow_inverse[:, 9, :, :] * mask_boundry_var
+
+        overall = ((reconstruction_from_prev + reconstruction_from_prev_inverse) / 2.0)
+
+        return overall.sum(dim=1).sum(dim=1)
+
     def _initialize_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -70,6 +103,14 @@ class CANNet2s(nn.Module):
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
+
+    def load(self, filepath, testing=True):
+        if testing:
+            self.eval()
+        checkpoint = torch.load(filepath)
+
+        self.load_state_dict(checkpoint['state_dict'])
+
 
 def make_layers(cfg, in_channels = 3,batch_norm=False,dilation = False):
     if dilation:

@@ -1,6 +1,7 @@
 import h5py
 import torch
 import shutil
+import numpy as np
 
 def save_net(fname, net):
     with h5py.File(fname, 'w') as h5f:
