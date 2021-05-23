@@ -8,30 +8,33 @@ import misc.transforms as own_transforms
 import pandas as pd
 
 from models.CC import CrowdCounter
+import torchvision.models as tmodels
 from config import cfg
 from misc.utils import *
-import torchvision.models as models
 from models.ptflops import get_model_complexity_info
-from models.MCNN import MCNN
-from models.VGG import VGG
-from models.VGG_decoder import VGG_decoder
-from models.gcy import ResNetLW
-from models.DeepLab_v3_2 import DeepLabv3
-from models.LWRF_MobileNetv2 import MobileNetLWRF
-from models.LWRF_ShuffleNetv2 import ShuffleNetLWRF
-from models.CSRNet import CSRNet
-from models.Res50 import Res50
-from models.MobileNetv2 import MobileNetV2
-from models.CMTL import CMTL
-from models.SANet import SANet
-from models.FPN import FPN
-from models.MobileNetv2_org_4 import MobileNetV2 as mob_org
-from models.Setting1_LWRN import MobileNetLWRF as setting1
-from models.Setting2_LWRN import MobileNetLWRF as setting2
-from models.Setting3_LWRN import MobileNetLWRF as setting3
-from models.Vanila_MNV2_4BN import MobileNetV2 as MNV2_4BN
-from models.Vanila_MNV2_7BN import MobileNetV2 as MNV2_7BN
-from models.Setting1_backbone import MobileNetV2 as S1_BB
+
+from torchvision.models import vgg16, vgg19, vgg11
+"""
+from torchvision.models import MCNN
+from torchvision.models.VGG import VGG
+from torchvision.models.VGG_decoder import VGG_decoder
+from torchvision.models.gcy import ResNetLW
+from torchvision.models.DeepLab_v3_2 import DeepLabv3
+from torchvision.models.LWRF_MobileNetv2 import MobileNetLWRF
+from torchvision.models.LWRF_ShuffleNetv2 import ShuffleNetLWRF
+from torchvision.models.CSRNet import CSRNet
+from torchvision.models.Res50 import Res50
+from torchvision.models.MobileNetv2 import MobileNetV2
+from torchvision.models.CMTL import CMTL
+from torchvision.models.SANet import SANet
+from torchvision.models.FPN import FPN
+from torchvision.models.MobileNetv2_org_4 import MobileNetV2 as mob_org
+from torchvision.models.Setting1_LWRN import MobileNetLWRF as setting1
+from torchvision.models.Setting2_LWRN import MobileNetLWRF as setting2
+from torchvision.models.Setting3_LWRN import MobileNetLWRF as setting3
+from torchvision.models.Vanila_MNV2_4BN import MobileNetV2 as MNV2_4BN
+from torchvision.models.Vanila_MNV2_7BN import MobileNetV2 as MNV2_7BN
+from torchvision.models.Setting1_backbone import MobileNetV2 as S1_BB
 
 pt_models = { 'resnet18': models.resnet18, 'resnet50': models.resnet50,
               'alexnet': models.alexnet, 'CMTL': CMTL, 'SANet': SANet,
@@ -42,7 +45,8 @@ pt_models = { 'resnet18': models.resnet18, 'resnet50': models.resnet50,
               'ShuffleNetLWRF': ShuffleNetLWRF, 'CSRNet': CSRNet, 'Res50': Res50,
               'mob_org': mob_org, 'setting1': setting1, 'setting2': setting2, 'setting3': setting3,
               'MNV2_4BN': MNV2_4BN, 'MNV2_7BN': MNV2_7BN, 'S1_BB': S1_BB
-              }
+              }"""
+pt_models = {'vgg16': vgg16, 'vgg19': vgg19, 'vgg11': vgg11}
 
 torch.cuda.set_device(0)
 torch.backends.cudnn.benchmark = True
@@ -59,7 +63,8 @@ def main():
 def test():
     # net = MCNN()
 
-    net = pt_models['S1_BB']()
+    net = pt_models['vgg19'](pretrained=True)
+
     flops, params = get_model_complexity_info(net, (1920, 1080), as_strings=False, print_per_layer_stat=False)
     print('FLOPs')
     print(flops)
