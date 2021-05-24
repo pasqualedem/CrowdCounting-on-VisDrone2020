@@ -1,13 +1,11 @@
 import os
 import torch
 import torchvision
-import pandas as pd
 import h5py
 
 from PIL import Image as pil
-from PIL import ImageOps as pilops
-from sklearn import model_selection
 import numpy as np
+import pandas as pd
 
 ROOT_DATAPATH = '../dataset/FDST'
 TRAIN_DATAPATH = os.path.join(ROOT_DATAPATH, 'train_data')
@@ -59,34 +57,6 @@ class PeopleFlowsDataset(torch.utils.data.Dataset):
 
     def get_targets(self):
         return self.targets
-
-
-def load_train_valid_datasets(valid_size=0.1):
-    # Load the train dataframe
-    filepath = os.path.join(ROOT_DATAPATH, 'train.csv')
-    df = pd.read_csv(
-        filepath, sep=',', usecols=['filename', 'class'],
-        converters={'class': lambda c: 1 if c == 'positive' else 0}
-    )
-
-    # Split the dataframe in train and validation
-    train_df, valid_df = model_selection.train_test_split(
-        df, test_size=valid_size, shuffle=True, stratify=df['class']
-    )
-
-    # Instantiate the datasets (notice data augmentation on train data)
-    train_data = PeopleFlowsDataset(TRAIN_DATAPATH, train_df)
-    valid_data = PeopleFlowsDataset(TRAIN_DATAPATH, valid_df)
-    return train_data, valid_data
-
-
-def load_test_dataset(data_folder=TEST_DATAPATH):
-    # Load the test dataframe
-    test_df = make_dataframe(data_folder)
-
-    # Instantiate the dataset
-    test_data = PeopleFlowsDataset(data_folder, test_df)
-    return test_data
 
 
 def make_dataframe(folder):
