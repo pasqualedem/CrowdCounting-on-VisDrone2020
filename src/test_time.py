@@ -7,6 +7,7 @@ import time
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from ast import literal_eval
 import gc
 
 import torch
@@ -100,9 +101,9 @@ def test(model, dim, batch_sizes, num_runs, num_warmup_runs, file):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Compute time for an image.')
     parser.add_argument('model', type=str, help='model name to be evaluated')
-    parser.add_argument('--input_size', type=tuple, default=(3, 512, 512),
+    parser.add_argument('--input_size', type=str, default="(3, 512, 512)",
                         help='size of the input image size. default is 3x512x512')
-    parser.add_argument('--batch_sizes', type=list, default=[1, 2, 4],
+    parser.add_argument('--batch_sizes', type=str, default="[1, 2, 4]",
                         help='list of batch size to try. default is [1, 2, 4]')
     parser.add_argument('--num_runs', type=int, default=105,
                         help='number of runs to compute average forward timing. default is 105')
@@ -114,4 +115,4 @@ if __name__ == '__main__':
 
     model = models[args.model]()
     print('Model is loaded, start forwarding.')
-    test(model, args.input_size, args.batch_sizes, args.num_runs, args.num_warmup_runs, args.file)
+    test(model, literal_eval(args.input_size), literal_eval(args.batch_sizes), args.num_runs, args.num_warmup_runs, args.file)

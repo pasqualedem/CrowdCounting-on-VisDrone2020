@@ -75,7 +75,7 @@ def test(file_list, model_path):
     time_sampe = 0
     for filename in file_list:
         step = step + 1
-        print filename
+        print(filename)
         imgname = dataRoot + '/img/' + filename
         filename_no_ext = filename.split('.')[0]
 
@@ -135,7 +135,7 @@ def test(file_list, model_path):
     mae = maes.avg
     mse = np.sqrt(mses.avg)
 
-    print '\n[MAE: %fms][MSE: %fms]' % (mae, mse)
+    print('\n[MAE: %fms][MSE: %fms]' % (mae, mse))
 
 
 def get_pts(data):

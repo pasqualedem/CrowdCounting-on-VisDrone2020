@@ -1,5 +1,6 @@
 import torch
 from tqdm import tqdm
+import traceback
 
 def test_model(
         model,
@@ -24,21 +25,23 @@ def test_model(
     y_true = []
     y_pred = []
 
-    with torch.no_grad():
-        for inputs, prev_inputs, targets in tqdm(test_loader):
-            inputs, prev_inputs, targets = inputs.to(device), prev_inputs.to(device), targets.to(device)
-            predictions = model.predict(inputs, prev_inputs)
-            y_pred.extend(predictions.cpu().tolist())
-            y_true.extend(targets.cpu().tolist())
-    return y_true, y_pred
+    try:
+        with torch.no_grad():
+            for *inputs, targets in tqdm(test_loader):
+                inputs = [inp.to(device) for inp in inputs]
+                targets = targets.to(device)
+                predictions = model.predict(*inputs)
+                y_pred.extend(predictions.cpu().tolist())
+                y_true.extend(targets.cpu().tolist())
+    except Exception as e:
+        traceback.print_exc()
+    finally:
+        return y_true, y_pred
 
 
-def evaluate_model(model_folder, data_folder, bs, n_workers, losses, device=None):
-    from dataset import load_test_dataset
-    from model import CANNet2s
-    ds = load_test_dataset(data_folder)
-    net = CANNet2s()
-    net.load(model_folder, testing=True)
+def evaluate_model(model_function, data_function, bs, n_workers, losses, device=None):
+    ds = data_function()
+    net = model_function()
     net = net.cuda()
     y_true, y_pred = test_model(net, ds, bs, n_workers, device)
 

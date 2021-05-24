@@ -12,9 +12,8 @@ import gc
 import datetime
 import os
 from torchvision.models import vgg16, vgg19, vgg11
-from model_flows import flows
 
-pt_models = {'vgg16': vgg16, 'vgg19': vgg19, 'vgg11': vgg11, 'flows': flows}
+pt_models = {'vgg16': vgg16, 'vgg19': vgg19, 'vgg11': vgg11}
 
 
 def measure(model, x):

@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import pdb
+import numpy as np
 
 class CrowdCounter(nn.Module):
     def __init__(self,gpus,model_name):
@@ -32,7 +33,13 @@ class CrowdCounter(nn.Module):
         density_map = self.CCN(img)                          
         self.loss_mse= self.build_loss(density_map.squeeze(), gt_map.squeeze())               
         return density_map
-    
+
+    def predict(self, img):
+        return torch.sum(self.test_forward(img), dim=(1, 2, 3))
+
+    def load(self, model_path):
+        self.load_state_dict(torch.load(model_path))
+
     def build_loss(self, density_map, gt_data):
         loss_mse = self.loss_mse_fn(density_map, gt_data)  
         return loss_mse

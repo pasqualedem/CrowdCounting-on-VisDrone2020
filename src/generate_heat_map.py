@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from scipy.ndimage.filters import gaussian_filter
 import matplotlib.pyplot as plt
+import h5py
 from tqdm import tqdm
 GAMMA = 3
 FILENAME_LEN = 5
@@ -31,10 +32,9 @@ def make_ground_truth(folder, img_folder):
         dim = plt.imread(os.path.join(seq_folder, '00001.jpg')).shape[:2]
         heatmaps = generate_heatmap(os.path.join(folder, gt), dim)
         for heatmap in heatmaps:
-            plt.imsave(arr=heatmaps[heatmap],
-                       fname=os.path.join(seq_folder, (str(heatmap).zfill(FILENAME_LEN) + '.png')),
-                       cmap='viridis',
-                       format='png')
+            hf = h5py.File(os.path.join(seq_folder, (str(heatmap).zfill(FILENAME_LEN) + '.h5')), 'w')
+            hf.create_dataset('density', data=heatmaps[heatmap])
+            hf.close()
 
 
 if __name__ == '__main__':
