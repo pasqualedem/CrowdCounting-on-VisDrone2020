@@ -15,7 +15,7 @@ class ContextualModule(nn.Module):
 
     def __make_weight(self,feature,scale_feature):
         weight_feature = feature - scale_feature
-        return F.sigmoid(self.weight_net(weight_feature))
+        return torch.sigmoid(self.weight_net(weight_feature))
 
     def _make_scale(self, features, size):
         prior = nn.AdaptiveAvgPool2d(output_size=(size, size))
@@ -24,7 +24,7 @@ class ContextualModule(nn.Module):
 
     def forward(self, feats):
         h, w = feats.size(2), feats.size(3)
-        multi_scales = [F.upsample(input=stage(feats), size=(h, w), mode='bilinear') for stage in self.scales]
+        multi_scales = [F.interpolate(input=stage(feats), size=(h, w), mode='bilinear', align_corners=True) for stage in self.scales]
         weights = [self.__make_weight(feats,scale_feature) for scale_feature in multi_scales]
         overall_features = [(multi_scales[0]*weights[0]+multi_scales[1]*weights[1]+multi_scales[2]*weights[2]+multi_scales[3]*weights[3])/(weights[0]+weights[1]+weights[2]+weights[3])]+ [feats]
         bottle = self.bottleneck(torch.cat(overall_features, 1))

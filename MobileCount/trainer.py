@@ -45,7 +45,7 @@ class Trainer():
     def forward(self):
 
         # self.validate_V1()
-        for epoch in range(cfg.MAX_EPOCH):
+        for epoch in range(cfg.INIT_EPOCH, cfg.MAX_EPOCH):
             self.epoch = epoch
             if epoch > cfg.LR_DECAY_START:
                 self.scheduler.step()
