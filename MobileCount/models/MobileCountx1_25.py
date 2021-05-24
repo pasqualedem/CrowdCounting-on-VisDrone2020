@@ -10,6 +10,10 @@ from torch.autograd import Variable
 import torchvision.models as models
 
 
+def xrange(x):
+    return iter(range(x))
+
+
 model_urls = {
     'resnet101': 'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth',
     'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
