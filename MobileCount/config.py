@@ -20,9 +20,9 @@ if __C.DATASET == 'GCC':# only for GCC
 	__C.VAL_MODE = cfg_data.VAL_MODE 
 
 
-__C.NET = 'MobileCount' # net selection: MobileCount, MobileCountx1_25, MobileCountx2
+__C.NET = 'MobileCountx1_25' # net selection: MobileCount, MobileCountx1_25, MobileCountx2
 
-__C.PRE_GCC = True # use the pretrained model on GCC dataset
+__C.PRE_GCC = False # use the pretrained model on GCC dataset
 # __C.PRE_GCC_MODEL = './exp/04-06_16-19_GCC_CSRNet_0.0001_rd/all_ep_130_mae_34.9_mse_71.9.pth' # path to model
 __C.PRE_GCC_MODEL = 'exp/05-22_20-47_SHHA_MobileCount_0.0001/all_ep_281_mae_93.9_mse_154.4.pth'
 
@@ -34,7 +34,7 @@ __C.LR_DECAY = 0.995 # decay rate
 __C.LR_DECAY_START = -1 # when training epoch is more than it, the learning rate will be begin to decay
 __C.NUM_EPOCH_LR_DECAY = 1 # decay frequency
 __C.MAX_EPOCH = 500
-__C.INIT_EPOCH = 281
+__C.INIT_EPOCH = 0
 
 # print 
 __C.PRINT_FREQ = 10
