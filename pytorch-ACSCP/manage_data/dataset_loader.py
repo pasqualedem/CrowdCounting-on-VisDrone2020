@@ -10,7 +10,6 @@ import os.path as osp
 from scipy.io import loadmat
 import numpy as np
 import h5py
-from scipy.misc import imsave
 import scipy.io as sio
 
 from manage_data.get_density_map import create_density_map
@@ -165,21 +164,21 @@ class UCF_CC_50(object):
                 copy_to_directory(test_img_paths, fold_test_dir_img)
 
 class ShanghaiTech(object):
-    root = 'data/ShanghaiTech/'
+    root = '../dataset/ShanghaiTech/'
     ori_dir_partA = osp.join(root, 'part_A')
     ori_dir_partA_train = osp.join(ori_dir_partA, 'train_data')
-    ori_dir_partA_train_mat = osp.join(ori_dir_partA_train, 'ground-truth')
+    ori_dir_partA_train_mat = osp.join(ori_dir_partA_train, 'ground_truth')
     ori_dir_partA_train_img = osp.join(ori_dir_partA_train, 'images')
     ori_dir_partA_test = osp.join(ori_dir_partA, 'test_data')
-    ori_dir_partA_test_mat = osp.join(ori_dir_partA_test, 'ground-truth')
+    ori_dir_partA_test_mat = osp.join(ori_dir_partA_test, 'ground_truth')
     ori_dir_partA_test_img = osp.join(ori_dir_partA_test, 'images')
 
     ori_dir_partB = osp.join(root, 'part_B')
     ori_dir_partB_train = osp.join(ori_dir_partB, 'train_data')
-    ori_dir_partB_train_mat = osp.join(ori_dir_partB_train, 'ground-truth')
+    ori_dir_partB_train_mat = osp.join(ori_dir_partB_train, 'ground_truth')
     ori_dir_partB_train_img = osp.join(ori_dir_partB_train, 'images')
     ori_dir_partB_test = osp.join(ori_dir_partB, 'test_data')
-    ori_dir_partB_test_mat = osp.join(ori_dir_partB_test, 'ground-truth')
+    ori_dir_partB_test_mat = osp.join(ori_dir_partB_test, 'ground_truth')
     ori_dir_partB_test_img = osp.join(ori_dir_partB_test, 'images')
 
     #to be computed
