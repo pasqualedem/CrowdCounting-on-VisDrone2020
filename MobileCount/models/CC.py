@@ -41,8 +41,8 @@ class CrowdCounter(nn.Module):
         self.load_state_dict(torch.load(model_path))
 
     def build_loss(self, density_map, gt_data):
-        loss_mse = self.loss_mse_fn(density_map.squeeze(), gt_data.squeeze())
-        return loss_mse
+        self.loss_mse = self.loss_mse_fn(density_map.squeeze(), gt_data.squeeze())
+        return self.loss_mse
 
     def test_forward(self, img):                               
         density_map = self.CCN(img)                    
