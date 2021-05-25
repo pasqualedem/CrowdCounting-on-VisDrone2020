@@ -1,16 +1,19 @@
 from evaluate import evaluate_model
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from models.CC import CrowdCounter
-from dataset.visdrone import load_test
+from dataset.visdrone import load_test, load_train_val, cfg_data
+from train import Trainer
+from config import cfg
 
 
 def load_CC():
     cc = CrowdCounter([0], 'MobileCount')
-    cc.load('../MobileCount/exp/05-24_12-41_SHHA_MobileCount_0.0001/all_ep_455_mae_95.8_mse_148.7.pth')
+    if cfg.PRE_TRAINED:
+        cc.load(cfg.PRE_TRAINED)
     return cc
 
 
-if __name__ == '__main__':
+def test_net():
     res = evaluate_model(model_function=load_CC,
                          data_function=load_test,
                          bs=8,
@@ -18,3 +21,15 @@ if __name__ == '__main__':
                          losses={'mse': mean_squared_error, 'mae': mean_absolute_error},
                          )
     print(res)
+
+
+def train_net():
+    trainer = Trainer(dataloader=load_train_val,
+                      cfg_data=cfg_data,
+                      net_fun=load_CC
+                      )
+    trainer.train()
+
+
+if __name__ == '__main__':
+    train_net()

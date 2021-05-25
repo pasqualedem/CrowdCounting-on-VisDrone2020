@@ -1,149 +1,141 @@
-import time
-import torch
 import numpy as np
 
+import torch
+from torch import optim
+from torch.optim.lr_scheduler import StepLR
+
+from config import cfg
+from utils import *
+import time
 from tqdm import tqdm
-from utils import EarlyStopping, RunningAverageMetric, get_optimizer
 
 
-def train_classifier(
-        model,
-        train_data,
-        valid_data,
-        lr=1e-3,
-        optimizer='adam',
-        batch_size=128,
-        epochs=100,
-        patience=5,
-        weight_decay=0.0,
-        n_workers=4,
-        device=None,
-        verbose=True
-):
-    # Get the device to use
-    if device is None:
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print('Train using device: ' + str(device))
+class Trainer():
+    def __init__(self, dataloader, cfg_data, net_fun):
 
-    # Setup the data loaders
-    train_loader = torch.utils.data.DataLoader(
-        train_data, batch_size=batch_size, shuffle=True, num_workers=n_workers
-    )
-    valid_loader = torch.utils.data.DataLoader(
-        valid_data, batch_size=batch_size, shuffle=False, num_workers=n_workers
-    )
+        self.cfg_data = cfg_data
 
-    # Compute the class weights (due to dataset im-balance)
-    _, class_counts = np.unique(train_data.get_targets(), return_counts=True)
-    class_weights = np.min(class_counts) / class_counts
+        self.exp_name = cfg.EXP_NAME
+        self.exp_path = cfg.EXP_PATH
 
-    # Instantiate the NLL losses (with weights)
-    nll_loss = torch.nn.NLLLoss(
-        weight=torch.tensor(class_weights, dtype=torch.float32, device=device),
-        reduction='sum'
-    )
+        self.net_name = cfg.NET
+        self.net = net_fun()
+        self.optimizer = optim.Adam(self.net.parameters(), lr=cfg.LR, weight_decay=1e-4)
+        # self.optimizer = optim.SGD(self.net.parameters(), cfg.LR, momentum=0.95,weight_decay=5e-4)
+        self.scheduler = StepLR(self.optimizer, step_size=cfg.NUM_EPOCH_LR_DECAY, gamma=cfg.LR_DECAY)
 
-    # Move the model to device
-    model.to(device)
+        self.train_record = {'best_mae': 1e20, 'best_mse': 1e20, 'best_model_name': ''}
+        self.timer = {'iter time': Timer(), 'train time': Timer(), 'val time': Timer()}
+        self.writer, self.log_txt = logger(self.exp_path, self.exp_name)
 
-    # Instantiate the optimizer
-    optimizer_kwargs = dict()
-    optimizer_class = get_optimizer(optimizer)
-    if optimizer_class == torch.optim.SGD:
-        # If using SGD, introduce Nesterov's momentum
-        optimizer_kwargs['momentum'] = 0.9
-        optimizer_kwargs['nesterov'] = True
-    optimizer = optimizer_class(
-        filter(lambda p: p.requires_grad, model.parameters()),
-        lr=lr, weight_decay=weight_decay, **optimizer_kwargs
-    )
+        self.i_tb = 0
+        self.epoch = -1
 
-    # Instantiate the train history
-    history = {
-        'train': {'loss': [], 'accuracy': []},
-        'validation': {'loss': [], 'accuracy': []}
-    }
+        self.train_loader, self.val_loader = dataloader()
 
-    # Instantiate the early stopping callback
-    early_stopping = EarlyStopping(model, patience=patience)
+    def train(self):
 
-    for epoch in range(epochs):
-        start_time = time.time()
+        # self.validate_V1()
+        for epoch in range(cfg.INIT_EPOCH, cfg.MAX_EPOCH):
+            self.epoch = epoch
+            if epoch > cfg.LR_DECAY_START:
+                self.scheduler.step()
 
-        # Initialize the tqdm train data loader, if verbose is enabled
-        if verbose:
-            tk_train = tqdm(
-                train_loader, leave=False, bar_format='{l_bar}{bar:32}{r_bar}',
-                desc='Train Epoch %d/%d' % (epoch + 1, epochs)
-            )
-        else:
-            tk_train = train_loader
+            # training
+            self.timer['train time'].tic()
+            self.forward_dataset()
+            self.timer['train time'].toc(average=False)
 
-        # Make sure the model is set to train mode
-        model.train()
+            print('train time: {:.2f}s'.format(self.timer['train time'].diff))
+            print('=' * 20)
 
-        # Training phase
-        running_train_loss = RunningAverageMetric(train_loader.batch_size)
-        running_train_hits = RunningAverageMetric(train_loader.batch_size)
-        for inputs, targets in tk_train:
-            inputs, targets = inputs.to(device), targets.to(device)
-            optimizer.zero_grad()
-            outputs = torch.log_softmax(model(inputs), dim=1)
-            loss = nll_loss(outputs, targets)
-            running_train_loss(loss.item())
-            loss /= train_loader.batch_size
+            # validation
+            if epoch % cfg.VAL_FREQ == 0 or epoch > cfg.VAL_DENSE_START:
+                self.timer['val time'].tic()
+                self.validate()
+                self.timer['val time'].toc(average=False)
+                print('val time: {:.2f}s'.format(self.timer['val time'].diff))
+
+    def forward_dataset(self):  # training for all datasets
+        self.net.train()
+
+        tk_train = tqdm(
+            enumerate(self.train_loader, 0), leave=False, bar_format='{l_bar}{bar:32}{r_bar}',
+            desc='Train Epoch %d/%d' % (self.epoch + 1, cfg.MAX_EPOCH)
+        )
+
+        for i, data in tk_train:
+            self.timer['iter time'].tic()
+            img, gt = data
+            img = img.to(cfg.DEVICE)
+            gt = gt.to(cfg.DEVICE)
+
+            self.optimizer.zero_grad()
+            pred_count = self.net.predict(img)
+            loss = self.net.build_loss(pred_count, gt)
             loss.backward()
-            optimizer.step()
+            self.optimizer.step()
+
+            if (i + 1) % cfg.PRINT_FREQ == 0:
+                self.i_tb += 1
+                self.writer.add_scalar('train_loss', loss.item(), self.i_tb)
+                self.timer['iter time'].toc(average=False)
+                print('[ep %d][it %d][loss %.4f][lr %.4f][%.2fs]' % \
+                      (self.epoch + 1, i + 1, loss.item(), self.optimizer.param_groups[0]['lr'] * 10000,
+                       self.timer['iter time'].diff),
+                      '        [cnt: gt: %.1f pred: %.2f]' % (
+                          gt.data / self.cfg_data.LOG_PARA,
+                          pred_count.data / self.cfg_data.LOG_PARA))
+
+    def validate(self):
+
+        self.net.eval()
+
+        losses = AverageMeter()
+        maes = AverageMeter()
+        mses = AverageMeter()
+
+        time_sampe = 0
+        step = 0
+
+        tk_valid = tqdm(
+            enumerate(self.val_loader, 0), leave=False, bar_format='{l_bar}{bar:32}{r_bar}',
+            desc='Validating'
+        )
+
+        for vi, data in tk_valid:
+            img, gt = data
+
             with torch.no_grad():
-                predictions = torch.argmax(outputs, dim=1)
-                hits = torch.eq(predictions, targets).sum()
-                running_train_hits(hits.item())
+                img = img.cuda()
+                gt = img.cuda()
 
-        # Initialize the tqdm validation data loader, if verbose is specified
-        if verbose:
-            tk_val = tqdm(
-                valid_loader, leave=False, bar_format='{l_bar}{bar:32}{r_bar}',
-                desc='Validation Epoch %d/%d' % (epoch + 1, epochs)
-            )
-        else:
-            tk_val = valid_loader
+                step = step + 1
+                time_start1 = time.time()
+                pred_map = self.net.predict(img)
+                time_end1 = time.time()
+                self.net.build_loss(img, gt)
+                time_sampe = time_sampe + (time_end1 - time_start1)
 
-        # Make sure the model is set to evaluation mode
-        model.eval()
+                pred_map = pred_map.data.cpu().numpy()
+                gt = gt.data.cpu().numpy()
 
-        # Validation phase
-        running_val_loss = RunningAverageMetric(valid_loader.batch_size)
-        running_val_hits = RunningAverageMetric(valid_loader.batch_size)
-        with torch.no_grad():
-            for inputs, targets in tk_val:
-                inputs, targets = inputs.to(device), targets.to(device)
-                optimizer.zero_grad()
-                outputs = torch.log_softmax(model(inputs), dim=1)
-                loss = nll_loss(outputs, targets)
-                running_val_loss(loss.item())
-                predictions = torch.argmax(outputs, dim=1)
-                hits = torch.eq(predictions, targets).sum()
-                running_val_hits(hits.item())
+                pred_cnt = pred_map / self.cfg_data.LOG_PARA
+                gt_count = gt / self.cfg_data.LOG_PARA
 
-        # Get the average train and validation losses and accuracies and print it
-        end_time = time.time()
-        train_loss = running_train_loss.average()
-        train_accuracy = running_train_hits.average()
-        val_loss = running_val_loss.average()
-        val_accuracy = running_val_hits.average()
-        print('Epoch %d/%d - train_loss: %.4f, validation_loss: %.4f, train_acc: %.1f%%, validation_acc: %.1f%% [%ds]' %
-              (epoch + 1, epochs, train_loss, val_loss, train_accuracy*100, val_accuracy*100, end_time - start_time))
+                losses.update(self.net.loss.item())
+                maes.update(abs(gt_count - pred_cnt))
+                mses.update((gt_count - pred_cnt) * (gt_count - pred_cnt))
 
-        # Append losses and accuracies to history data
-        history['train']['loss'].append(train_loss)
-        history['train']['accuracy'].append(train_accuracy)
-        history['validation']['loss'].append(val_loss)
-        history['validation']['accuracy'].append(val_accuracy)
+        mae = maes.avg
+        mse = np.sqrt(mses.avg)
+        loss = losses.avg
 
-        # Check if training should stop according to early stopping
-        early_stopping(val_loss)
-        if early_stopping.should_stop:
-            print('Early Stopping... Best Loss: %.4f' % early_stopping.best_loss)
-            break
+        self.writer.add_scalar('val_loss', loss, self.epoch + 1)
+        self.writer.add_scalar('mae', mae, self.epoch + 1)
+        self.writer.add_scalar('mse', mse, self.epoch + 1)
 
-    return history, early_stopping.best_state
+        self.train_record = update_model(self.net, self.epoch, self.exp_path, self.exp_name, [mae, mse, loss],
+                                         self.train_record, self.log_txt)
+        print_summary(self.exp_name, [mae, mse, loss], self.train_record)
+        print('\nForward Time: %fms' % (time_sampe * 1000 / step))
