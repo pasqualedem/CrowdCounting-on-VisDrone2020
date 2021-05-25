@@ -64,7 +64,7 @@ class Trainer():
         norm_pred_count = 0
 
         tk_train = tqdm(
-            enumerate(self.train_loader, 0), leave=False, bar_format='{l_bar}{bar:32}{r_bar}',
+            enumerate(self.train_loader, 0), total=len(self.train_loader), leave=False, bar_format='{l_bar}{bar:32}{r_bar}',
             colour='#ff0de7', desc='Train Epoch %d/%d' % (self.epoch + 1, cfg.MAX_EPOCH)
         )
         postfix = {'loss': out_loss, 'lr': self.optimizer.param_groups[0]['lr'], 'time': time, 'gt count': norm_gt_count, 'pred count': norm_pred_count}
@@ -115,8 +115,8 @@ class Trainer():
         step = 0
 
         tk_valid = tqdm(
-            enumerate(self.val_loader, 0), leave=False, bar_format='{l_bar}{bar:32}{r_bar}',
-            desc='Validating'
+            enumerate(self.val_loader, 0), total=len(self.val_loader),
+            leave=False, bar_format='{l_bar}{bar:32}{r_bar}', desc='Validating'
         )
 
         for vi, data in tk_valid:
