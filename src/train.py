@@ -137,7 +137,7 @@ class Trainer():
                 gt = gt.data.cpu().numpy()
 
                 pred_cnt = np.sum(pred_map) / self.cfg_data.LOG_PARA
-                gt_count = torch.sum(gt) / self.cfg_data.LOG_PARA
+                gt_count = np.sum(gt) / self.cfg_data.LOG_PARA
 
                 losses.update(self.net.loss.item())
                 maes.update(abs(gt_count - pred_cnt))
