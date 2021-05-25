@@ -35,7 +35,6 @@ class Trainer():
 
     def train(self):
 
-        # self.validate_V1()
         for epoch in range(cfg.INIT_EPOCH, cfg.MAX_EPOCH):
             self.epoch = epoch
             if epoch > cfg.LR_DECAY_START:
@@ -133,7 +132,7 @@ class Trainer():
                 self.net.build_loss(pred_map, gt)
                 time_sampe = time_sampe + (time_end1 - time_start1)
 
-                pred_map = pred_map.data.cpu().numpy()
+                pred_map = pred_map.squeeze().data.cpu().numpy()
                 gt = gt.data.cpu().numpy()
 
                 pred_cnt = np.sum(pred_map, axis=(1, 2)) / self.cfg_data.LOG_PARA
