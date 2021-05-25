@@ -63,7 +63,7 @@ class VisDroneDataset(torch.utils.data.Dataset):
         if self.gt_transform:
             target = self.gt_transform(target)
 
-        return data, torch.sum(target)
+        return data, target
 
     def get_targets(self):
         return self.targets

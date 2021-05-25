@@ -58,11 +58,19 @@ class Trainer():
 
     def forward_dataset(self):  # training for all datasets
         self.net.train()
+        out_loss = 0
+        time = 0
+        norm_gt_count = 0
+        norm_pred_count = 0
 
         tk_train = tqdm(
             enumerate(self.train_loader, 0), leave=False, bar_format='{l_bar}{bar:32}{r_bar}',
-            desc='Train Epoch %d/%d' % (self.epoch + 1, cfg.MAX_EPOCH)
+            colour='#ff0de7', desc='Train Epoch %d/%d' % (self.epoch + 1, cfg.MAX_EPOCH)
         )
+        postfix = {'loss': out_loss, 'lr': self.optimizer.param_groups[0]['lr'], 'time': time, 'gt count': norm_gt_count, 'pred count': norm_pred_count}
+        # postfix = '[loss: %.4f, lr %.4f, Time: %.2fs, gt count: %.1f pred_count: %.2f]' % \
+        #     (out_loss, self.optimizer.param_groups[0]['lr'], time, norm_gt_count, norm_pred_count)
+        tk_train.set_postfix(postfix, refresh=True)
 
         for i, data in tk_train:
             self.timer['iter time'].tic()
@@ -71,8 +79,8 @@ class Trainer():
             gt = gt.to(cfg.DEVICE)
 
             self.optimizer.zero_grad()
-            pred_count = self.net.predict(img)
-            loss = self.net.build_loss(pred_count, gt)
+            pred_den = self.net.predict(img)
+            loss = self.net.build_loss(pred_den, gt)
             loss.backward()
             self.optimizer.step()
 
@@ -80,12 +88,20 @@ class Trainer():
                 self.i_tb += 1
                 self.writer.add_scalar('train_loss', loss.item(), self.i_tb)
                 self.timer['iter time'].toc(average=False)
+                """                
                 print('[ep %d][it %d][loss %.4f][lr %.4f][%.2fs]' % \
                       (self.epoch + 1, i + 1, loss.item(), self.optimizer.param_groups[0]['lr'] * 10000,
                        self.timer['iter time'].diff),
                       '        [cnt: gt: %.1f pred: %.2f]' % (
                           torch.mean(gt.data) / self.cfg_data.LOG_PARA,
-                          torch.mean(pred_count.data) / self.cfg_data.LOG_PARA))
+                          torch.mean(pred_count.data) / self.cfg_data.LOG_PARA))"""
+                out_loss = loss.item()
+                time = self.timer['iter time'].diff
+                norm_gt_count = torch.mean(torch.sum(gt, dim=(1, 2))).data / self.cfg_data.LOG_PARA
+                norm_pred_count = torch.mean(torch.sum(pred_den, dim=(1, 2, 3))).data / self.cfg_data.LOG_PARA
+                postfix = {'loss': out_loss, 'lr': self.optimizer.param_groups[0]['lr'], 'time': time,
+                           'gt count': norm_gt_count.item(), 'pred count': norm_pred_count.item()}
+                tk_train.set_postfix(postfix, refresh=True)
 
     def validate(self):
 
@@ -107,21 +123,21 @@ class Trainer():
             img, gt = data
 
             with torch.no_grad():
-                img = img.cuda()
-                gt = img.cuda()
+                img = img.to(cfg.DEVICE)
+                gt = gt.to(cfg.DEVICE)
 
                 step = step + 1
                 time_start1 = time.time()
                 pred_map = self.net.predict(img)
                 time_end1 = time.time()
-                self.net.build_loss(img, gt)
+                self.net.build_loss(pred_map, gt)
                 time_sampe = time_sampe + (time_end1 - time_start1)
 
                 pred_map = pred_map.data.cpu().numpy()
                 gt = gt.data.cpu().numpy()
 
-                pred_cnt = pred_map / self.cfg_data.LOG_PARA
-                gt_count = gt / self.cfg_data.LOG_PARA
+                pred_cnt = torch.sum(pred_map) / self.cfg_data.LOG_PARA
+                gt_count = torch.sum(gt) / self.cfg_data.LOG_PARA
 
                 losses.update(self.net.loss.item())
                 maes.update(abs(gt_count - pred_cnt))
