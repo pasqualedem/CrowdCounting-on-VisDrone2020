@@ -84,8 +84,8 @@ class Trainer():
                       (self.epoch + 1, i + 1, loss.item(), self.optimizer.param_groups[0]['lr'] * 10000,
                        self.timer['iter time'].diff),
                       '        [cnt: gt: %.1f pred: %.2f]' % (
-                          gt.data / self.cfg_data.LOG_PARA,
-                          pred_count.data / self.cfg_data.LOG_PARA))
+                          torch.mean(gt.data) / self.cfg_data.LOG_PARA,
+                          torch.mean(pred_count.data) / self.cfg_data.LOG_PARA))
 
     def validate(self):
 
