@@ -184,6 +184,13 @@ class AverageMeter(object):
         self.count = 0
 
     def update(self, cur_val):
+        if hasattr(cur_val, '__iter__'):
+            for val in cur_val:
+                self._update(val)
+        else:
+            self._update(cur_val)
+
+    def _update(self, cur_val):
         self.cur_val = cur_val
         self.sum += cur_val
         self.count += 1

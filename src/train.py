@@ -136,8 +136,8 @@ class Trainer():
                 pred_map = pred_map.data.cpu().numpy()
                 gt = gt.data.cpu().numpy()
 
-                pred_cnt = np.sum(pred_map) / self.cfg_data.LOG_PARA
-                gt_count = np.sum(gt) / self.cfg_data.LOG_PARA
+                pred_cnt = np.sum(pred_map, axis=(1, 2)) / self.cfg_data.LOG_PARA
+                gt_count = np.sum(gt, axis=(1, 2)) / self.cfg_data.LOG_PARA
 
                 losses.update(self.net.loss.item())
                 maes.update(abs(gt_count - pred_cnt))
