@@ -4,9 +4,9 @@ import time
 __C = EasyDict()
 cfg = __C
 
-__C.TRAIN_BATCH_SIZE = 1
+__C.TRAIN_BATCH_SIZE = 2
 __C.VAL_BATCH_SIZE = 1
-__C.N_WORKERS = 1
+__C.N_WORKERS = 4
 
 __C.PRE_TRAINED = None
 __C.EXP_PATH = './exp'

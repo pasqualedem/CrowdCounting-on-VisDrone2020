@@ -136,7 +136,7 @@ class Trainer():
                 pred_map = pred_map.data.cpu().numpy()
                 gt = gt.data.cpu().numpy()
 
-                pred_cnt = torch.sum(pred_map) / self.cfg_data.LOG_PARA
+                pred_cnt = np.sum(pred_map) / self.cfg_data.LOG_PARA
                 gt_count = torch.sum(gt) / self.cfg_data.LOG_PARA
 
                 losses.update(self.net.loss.item())
