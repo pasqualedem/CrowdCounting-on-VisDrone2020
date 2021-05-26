@@ -10,7 +10,7 @@ import time
 from tqdm import tqdm
 
 
-class Trainer():
+class Trainer:
     def __init__(self, dataloader, cfg_data, net_fun):
 
         self.cfg_data = cfg_data
@@ -28,13 +28,14 @@ class Trainer():
         self.timer = {'iter time': Timer(), 'train time': Timer(), 'val time': Timer()}
         self.writer, self.log_txt = logger(self.exp_path, self.exp_name)
 
+        self.score = np.nan
         self.i_tb = 0
         self.epoch = -1
 
         self.train_loader, self.val_loader = dataloader()
 
     def train(self):
-
+        early_stop = EarlyStopping(patience=cfg.PATIENCE, delta=cfg.EARLY_STOP_DELTA)
         for epoch in range(cfg.INIT_EPOCH, cfg.MAX_EPOCH):
             self.epoch = epoch
             if epoch > cfg.LR_DECAY_START:
@@ -55,6 +56,10 @@ class Trainer():
                 self.timer['val time'].toc(average=False)
                 print('val time: {:.2f}s'.format(self.timer['val time'].diff))
 
+            if early_stop(self.score):
+                print('Early stopped!')
+                break
+
     def forward_dataset(self):  # training for all datasets
         self.net.train()
         out_loss = 0
@@ -66,9 +71,8 @@ class Trainer():
             enumerate(self.train_loader, 0), total=len(self.train_loader), leave=False, bar_format='{l_bar}{bar:32}{r_bar}',
             colour='#ff0de7', desc='Train Epoch %d/%d' % (self.epoch + 1, cfg.MAX_EPOCH)
         )
-        postfix = {'loss': out_loss, 'lr': self.optimizer.param_groups[0]['lr'], 'time': time, 'gt count': norm_gt_count, 'pred count': norm_pred_count}
-        # postfix = '[loss: %.4f, lr %.4f, Time: %.2fs, gt count: %.1f pred_count: %.2f]' % \
-        #     (out_loss, self.optimizer.param_groups[0]['lr'], time, norm_gt_count, norm_pred_count)
+        postfix = {'loss': out_loss, 'lr': self.optimizer.param_groups[0]['lr'],
+                   'time': time, 'gt count': norm_gt_count, 'pred count': norm_pred_count}
         tk_train.set_postfix(postfix, refresh=True)
 
         for i, data in tk_train:
@@ -87,13 +91,6 @@ class Trainer():
                 self.i_tb += 1
                 self.writer.add_scalar('train_loss', loss.item(), self.i_tb)
                 self.timer['iter time'].toc(average=False)
-                """                
-                print('[ep %d][it %d][loss %.4f][lr %.4f][%.2fs]' % \
-                      (self.epoch + 1, i + 1, loss.item(), self.optimizer.param_groups[0]['lr'] * 10000,
-                       self.timer['iter time'].diff),
-                      '        [cnt: gt: %.1f pred: %.2f]' % (
-                          torch.mean(gt.data) / self.cfg_data.LOG_PARA,
-                          torch.mean(pred_count.data) / self.cfg_data.LOG_PARA))"""
                 out_loss = loss.item()
                 time = self.timer['iter time'].diff
                 norm_gt_count = torch.mean(torch.sum(gt, dim=(1, 2))).data / self.cfg_data.LOG_PARA
@@ -153,4 +150,5 @@ class Trainer():
         self.train_record = update_model(self.net, self.epoch, self.exp_path, self.exp_name, [mae, mse, loss],
                                          self.train_record, self.log_txt)
         print_summary(self.exp_name, [mae, mse, loss], self.train_record)
+        self.score = mse
         print('\nForward Time: %fms' % (time_sampe * 1000 / step))

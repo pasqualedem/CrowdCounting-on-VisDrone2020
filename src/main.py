@@ -4,6 +4,8 @@ from models.CC import CrowdCounter
 from dataset.visdrone import load_test, load_train_val, cfg_data
 from train import Trainer
 from config import cfg
+import numpy as np
+import torch
 
 
 def load_CC():
@@ -32,4 +34,10 @@ def train_net():
 
 
 if __name__ == '__main__':
+    seed = cfg.SEED
+    if seed is not None:
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+
     train_net()

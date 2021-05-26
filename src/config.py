@@ -4,6 +4,8 @@ import time
 __C = EasyDict()
 cfg = __C
 
+__C.SEED = 3035  # random seed
+
 __C.TRAIN_BATCH_SIZE = 2
 __C.VAL_BATCH_SIZE = 8
 __C.N_WORKERS = 4
@@ -20,6 +22,9 @@ __C.LR_DECAY_START = -1  # when training epoch is more than it, the learning rat
 __C.NUM_EPOCH_LR_DECAY = 1  # decay frequency
 __C.MAX_EPOCH = 500
 __C.INIT_EPOCH = 0
+
+__C.PATIENCE = 15
+__C.EARLY_STOP_DELTA = 1e-2
 
 # print
 __C.PRINT_FREQ = 10
