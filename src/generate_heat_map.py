@@ -47,7 +47,7 @@ def make_ground_truth(folder, img_folder, name_rule, img_rule, dataframe_fun):
         df = dataframe_fun(os.path.join(folder, gt))
         heatmaps = generate_heatmap(df, dim)
         for heatmap in heatmaps:
-            hf = h5py.File(os.path.join(seq_folder, (str(heatmap).zfill(FILENAME_LEN) + '.h5')), 'w')
+            hf = h5py.File(os.path.join(seq_folder, (str(heatmap//10+1).zfill(FILENAME_LEN) + '.h5')), 'w')
             hf.create_dataset('density', data=heatmaps[heatmap])
             hf.close()
 
