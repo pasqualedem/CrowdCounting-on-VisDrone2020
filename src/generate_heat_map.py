@@ -47,7 +47,7 @@ def make_ground_truth(folder, img_folder, name_rule, img_rule, dataframe_fun):
         df = dataframe_fun(os.path.join(folder, gt))
         heatmaps = generate_heatmap(df, dim)
         for heatmap in heatmaps:
-            hf = h5py.File(os.path.join(seq_folder, (str(heatmap//10+1).zfill(FILENAME_LEN) + '.h5')), 'w')
+            hf = h5py.File(os.path.join(seq_folder, (str(heatmap).zfill(FILENAME_LEN) + '.h5')), 'w')
             hf.create_dataset('density', data=heatmaps[heatmap])
             hf.close()
 
@@ -77,8 +77,8 @@ if __name__ == '__main__':
     img_test_rule = lambda x, y: os.path.join(x, re.sub('\_clean$', '', y))
 
     train = [train_rule, img_train_rule, dataframe_load_train]
-    test = [test_rule, img_test_rule, dataframe_load_test]
+    test = [test_rule, img_test_rule, dataframe_load_test,]
 
     make_ground_truth('../dataset/VisDrone2020-CC/annotations',
-                      '../dataset/VisDrone2020-CC/sequences',
-                      *train)
+                      '../dataset/VisDrone2020-CC/test',
+                      *test)
