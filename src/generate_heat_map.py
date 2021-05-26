@@ -17,8 +17,8 @@ def generate_heatmap(df, dim):
     frames = np.unique(df['frame'].values)
     for frame in frames:
         heads = df[df['frame'] == frame][['x', 'y']].values
-        heatmap = np.zeros(dim[::-1])
-        heatmap[np.clip(heads[:, 1], 0, dim[1]) - 1, np.clip(heads[:, 0] - 1, 0, dim[0]) - 1] = 1
+        heatmap = np.zeros(dim)
+        heatmap[np.clip(heads[:, 1], 0, dim[0]) - 1, np.clip(heads[:, 0] - 1, 0, dim[1]) - 1] = 1
         heatmap = gaussian_filter(heatmap, GAMMA)
         heatmaps[frame] = heatmap
     return heatmaps
@@ -60,7 +60,7 @@ if __name__ == '__main__':
         df['y'] = df['y'] + df['height'] // 2
 
         df = df[(df['frame'] % 10) == 1]
-
+        df['frame'] = df['frame'] // 10 + 1
         return df[['frame', 'x', 'y']]
 
 
@@ -70,14 +70,15 @@ if __name__ == '__main__':
         return df
 
 
+    train_rule = lambda x: '.txt' in x and 'clean' not in x
     test_rule = lambda x: '_clean.txt' in x
 
     img_train_rule = lambda x, y: os.path.join(x, y)
     img_test_rule = lambda x, y: os.path.join(x, re.sub('\_clean$', '', y))
 
-    train = [lambda x: True, img_train_rule, dataframe_load_train]
+    train = [train_rule, img_train_rule, dataframe_load_train]
     test = [test_rule, img_test_rule, dataframe_load_test]
 
-    make_ground_truth('dataset/VisDrone2020-CC/annotations',
-                      'dataset/VisDrone2020-CC/test',
-                      *test)
+    make_ground_truth('../dataset/VisDrone2020-CC/annotations',
+                      '../dataset/VisDrone2020-CC/sequences',
+                      *train)
