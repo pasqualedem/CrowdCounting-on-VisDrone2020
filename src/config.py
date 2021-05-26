@@ -5,13 +5,13 @@ __C = EasyDict()
 cfg = __C
 
 __C.TRAIN_BATCH_SIZE = 2
-__C.VAL_BATCH_SIZE = 1
+__C.VAL_BATCH_SIZE = 8
 __C.N_WORKERS = 4
 
 __C.PRE_TRAINED = None
 __C.EXP_PATH = './exp'
 __C.DATASET = 'VisDrone'
-__C.NET = 'MobileCount'
+__C.NET = 'MobileCountx2'
 
 # learning rate settings
 __C.LR = 1e-4  # learning rate

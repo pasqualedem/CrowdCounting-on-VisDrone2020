@@ -7,7 +7,7 @@ from config import cfg
 
 
 def load_CC():
-    cc = CrowdCounter([0], 'MobileCount')
+    cc = CrowdCounter([0], 'MobileCountx2')
     if cfg.PRE_TRAINED:
         cc.load(cfg.PRE_TRAINED)
     return cc
