@@ -18,7 +18,7 @@ def generate_heatmap(df, dim):
     for frame in frames:
         heads = df[df['frame'] == frame][['x', 'y']].values
         heatmap = np.zeros(dim)
-        heatmap[np.clip(heads[:, 1], 0, dim[1]) - 1, np.clip(heads[:, 0] - 1, 0, dim[0])] = 1
+        heatmap[np.clip(heads[:, 1], 0, dim[1]) - 1, np.clip(heads[:, 0] - 1, 0, dim[0]) - 1] = 1
         heatmap = gaussian_filter(heatmap, GAMMA)
         heatmaps[frame] = heatmap
     return heatmaps
