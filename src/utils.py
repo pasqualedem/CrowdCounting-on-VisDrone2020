@@ -149,7 +149,7 @@ def print_summary(exp_name, scores, train_record):
     print('    ' + '-' * 20)
     print('[best] [model: %s] , [mae %.2f], [mse %.2f]' % (train_record['best_model_name'],
                                                            train_record['best_mae'],
-                                                           train_record['best_mse']))
+                                                           train_record['best_rmse']))
     print('=' * 50)
 
 
