@@ -154,11 +154,11 @@ def print_summary(exp_name, scores, train_record):
 
 
 def update_model(net, epoch, exp_path, exp_name, scores, train_record, log_file):
-    mae, mse, loss = scores
+    mae, rmse, loss = scores
 
-    snapshot_name = 'all_ep_%d_mae_%.1f_mse_%.1f' % (epoch + 1, mae, mse)
+    snapshot_name = 'all_ep_%d_mae_%.1f_rmse_%.1f' % (epoch + 1, mae, rmse)
 
-    if mae < train_record['best_mae'] or mse < train_record['best_mse']:
+    if mae < train_record['best_mae'] or rmse < train_record['best_rmse']:
         train_record['best_model_name'] = snapshot_name
         logger_txt(log_file, epoch, scores)
         to_saved_weight = net.state_dict()
@@ -166,8 +166,8 @@ def update_model(net, epoch, exp_path, exp_name, scores, train_record, log_file)
 
     if mae < train_record['best_mae']:
         train_record['best_mae'] = mae
-    if mse < train_record['best_mse']:
-        train_record['best_mse'] = mse
+    if rmse < train_record['best_rmse']:
+        train_record['best_rmse'] = rmse
 
     return train_record
 

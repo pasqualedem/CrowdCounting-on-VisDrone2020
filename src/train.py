@@ -140,15 +140,15 @@ class Trainer:
                 mses.update((gt_count - pred_cnt) * (gt_count - pred_cnt))
 
         mae = maes.avg
-        mse = np.sqrt(mses.avg)
+        rmse = np.sqrt(mses.avg)
         loss = losses.avg
 
         self.writer.add_scalar('val_loss', loss, self.epoch + 1)
         self.writer.add_scalar('mae', mae, self.epoch + 1)
-        self.writer.add_scalar('mse', mse, self.epoch + 1)
+        self.writer.add_scalar('rmse', rmse, self.epoch + 1)
 
-        self.train_record = update_model(self.net, self.epoch, self.exp_path, self.exp_name, [mae, mse, loss],
+        self.train_record = update_model(self.net, self.epoch, self.exp_path, self.exp_name, [mae, rmse, loss],
                                          self.train_record, self.log_txt)
-        print_summary(self.exp_name, [mae, mse, loss], self.train_record)
-        self.score = mse
+        print_summary(self.exp_name, [mae, rmse, loss], self.train_record)
+        self.score = rmse
         print('\nForward Time: %fms' % (time_sampe * 1000 / step))
