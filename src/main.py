@@ -9,7 +9,7 @@ import torch
 
 
 def load_CC():
-    cc = CrowdCounter([0], 'MobileCountx2')
+    cc = CrowdCounter([0], 'MobileCount')
     if cfg.PRE_TRAINED:
         cc.load(cfg.PRE_TRAINED)
     return cc
@@ -19,7 +19,7 @@ def test_net():
     res = evaluate_model(model_function=load_CC,
                          data_function=load_test,
                          bs=8,
-                         n_workers=2,
+                         n_workers=4,
                          losses={'mse': mean_squared_error, 'mae': mean_absolute_error},
                          )
     print(res)
@@ -40,4 +40,4 @@ if __name__ == '__main__':
         torch.manual_seed(seed)
         torch.cuda.manual_seed(seed)
 
-    train_net()
+    test_net()

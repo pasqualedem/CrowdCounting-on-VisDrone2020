@@ -1,6 +1,5 @@
 import torch
 from tqdm import tqdm
-import traceback
 
 def test_model(
         model,
@@ -25,24 +24,25 @@ def test_model(
     y_true = []
     y_pred = []
 
-    try:
-        with torch.no_grad():
-            for *inputs, targets in tqdm(test_loader):
-                inputs = [inp.to(device) for inp in inputs]
-                targets = targets.to(device)
-                predictions = model.predict(*inputs)
-                y_pred.extend(predictions.cpu().tolist())
-                y_true.extend(targets.cpu().tolist())
-    except Exception as e:
-        traceback.print_exc()
-    finally:
+    with torch.no_grad():
+        for *inputs, targets in tqdm(test_loader):
+            inputs = [inp.to(device) for inp in inputs]
+            targets = targets.to(device)
+            predictions = model.predict(*inputs)
+
+            count_pr = torch.sum(predictions, dim=(1, 2))
+            count_gt = torch.sum(targets, dim=(1, 2))
+
+            y_pred.extend(count_pr.cpu().tolist())
+            y_true.extend(count_gt.cpu().tolist())
+
         return y_true, y_pred
 
 
 def evaluate_model(model_function, data_function, bs, n_workers, losses, device=None):
     ds = data_function()
     net = model_function()
-    net = net.cuda()
+    net = net.to(device)
     y_true, y_pred = test_model(net, ds, bs, n_workers, device)
 
     results = {}

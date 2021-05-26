@@ -10,7 +10,7 @@ __C.TRAIN_BATCH_SIZE = 1
 __C.VAL_BATCH_SIZE = 6
 __C.N_WORKERS = 4
 
-__C.PRE_TRAINED = None
+__C.PRE_TRAINED = '../src/exp/05-25_19-52_VisDrone_MobileCount_0.0001/all_ep_90_mae_6.2_mse_8.4.pth'
 __C.EXP_PATH = './exp'
 __C.DATASET = 'VisDrone'
 __C.NET = 'MobileCountx2'
