@@ -57,7 +57,7 @@ class Trainer:
                 print('val time: {:.2f}s'.format(self.timer['val time'].diff))
 
             if early_stop(self.score):
-                print('Early stopped!')
+                print('Early stopped! At epoch' + str(self.epoch))
                 break
 
     def forward_dataset(self):  # training for all datasets
@@ -149,5 +149,5 @@ class Trainer:
 
         self.train_record = update_model(self.net, self.epoch, self.exp_path, self.exp_name, [mae, rmse, loss],
                                          self.train_record, self.log_txt)
-        print_summary(self.exp_name, [mae, rmse, loss], self.train_record, time_sampe * 1000 / step)
+        print_summary(self.epoch, self.exp_name, [mae, rmse, loss], self.train_record)
         self.score = rmse

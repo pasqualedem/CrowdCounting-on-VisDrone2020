@@ -9,7 +9,7 @@ import torch
 
 
 def load_CC():
-    cc = CrowdCounter([0], 'MobileCount')
+    cc = CrowdCounter([0], 'MobileCountx2')
     if cfg.PRE_TRAINED:
         cc.load(cfg.PRE_TRAINED)
     return cc
@@ -40,4 +40,4 @@ if __name__ == '__main__':
         torch.manual_seed(seed)
         torch.cuda.manual_seed(seed)
 
-    test_net()
+    train_net()
