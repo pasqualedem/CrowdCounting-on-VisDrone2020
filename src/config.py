@@ -6,19 +6,18 @@ cfg = __C
 
 __C.SEED = 3035  # random seed
 
-
 # System settings
-__C.TRAIN_BATCH_SIZE = 1
+__C.TRAIN_BATCH_SIZE = 2
 __C.VAL_BATCH_SIZE = 6
-__C.N_WORKERS = 2
+__C.N_WORKERS = 4
 
 __C.PRE_TRAINED = None
 
 # path settings
 __C.EXP_PATH = './exp'
 __C.DATASET = 'VisDrone'
-__C.NET = 'PROVA'
-__C.DETAILS = ''
+__C.NET = 'MobileCount'
+__C.DETAILS = '_1080x1920'
 
 # learning rate settings
 __C.LR = 1e-4  # learning rate
@@ -38,7 +37,8 @@ now = time.strftime("%m-%d_%H-%M", time.localtime())
 __C.EXP_NAME = now \
                + '_' + __C.DATASET \
                + '_' + __C.NET \
-               + '_' + str(__C.LR)
+               + '_' + str(__C.LR) \
+               + '_' + __C.DETAILS
 __C.DEVICE = 'cuda'  # cpu or cuda
 
 # ------------------------------VAL------------------------

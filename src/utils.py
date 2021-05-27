@@ -104,10 +104,10 @@ def logger(exp_path, exp_name):
     return writer, log_file
 
 
-def logger_txt(log_file, epoch, scores, details):
+def logger_txt(log_file, epoch, scores):
     mae, mse, loss = scores
 
-    snapshot_name = 'all_ep_%d_mae_%.1f_mse_%.1f' % (epoch + 1, mae, mse) + details
+    snapshot_name = 'all_ep_%d_mae_%.1f_mse_%.1f' % (epoch + 1, mae, mse)
 
     with open(log_file, 'a') as f:
         f.write('=' * 15 + '+' * 15 + '=' * 15 + '\n\n')
@@ -128,11 +128,11 @@ def print_summary(epoch, exp_name, scores, train_record, for_time, train_time, v
                                                            train_record['best_rmse']))
 
 
-def update_model(net, epoch, exp_path, exp_name, details, scores, train_record, log_file):
+def update_model(net, epoch, exp_path, exp_name, scores, train_record, log_file):
     mae, rmse, loss = scores
 
-    snapshot_name = 'all_ep_%d_mae_%.1f_rmse_%.1f' % (epoch + 1, mae, rmse) + details
-    logger_txt(log_file, epoch, scores, details)
+    snapshot_name = 'all_ep_%d_mae_%.1f_rmse_%.1f' % (epoch + 1, mae, rmse)
+    logger_txt(log_file, epoch, scores)
 
     if mae < train_record['best_mae'] or rmse < train_record['best_rmse']:
         train_record['best_model_name'] = snapshot_name

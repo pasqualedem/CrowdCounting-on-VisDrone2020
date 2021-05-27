@@ -23,8 +23,8 @@ class ProvaSet(torch.utils.data.Dataset):
     def __len__(self):
         return 50
 
-def prova():
 
+def prova():
 
     train_set = ProvaSet()
     train_loader = torch.utils.data.DataLoader(
@@ -48,7 +48,7 @@ def test_net():
 
 
 def train_net():
-    trainer = Trainer(dataloader=prova,
+    trainer = Trainer(dataloader=load_train_val,
                       cfg_data=cfg_data,
                       net_fun=load_CC
                       )
