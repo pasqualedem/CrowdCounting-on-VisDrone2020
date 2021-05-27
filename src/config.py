@@ -6,6 +6,8 @@ cfg = __C
 
 __C.SEED = 3035  # random seed
 
+
+# System settings
 __C.TRAIN_BATCH_SIZE = 1
 __C.VAL_BATCH_SIZE = 6
 __C.N_WORKERS = 4
