@@ -139,12 +139,14 @@ class Trainer:
         self.writer.add_scalar('mae', mae, self.epoch + 1)
         self.writer.add_scalar('rmse', rmse, self.epoch + 1)
 
-        self.train_record = update_model(self.net, self.epoch, self.exp_path, self.exp_name, [mae, rmse, loss],
-                                         self.train_record, self.log_txt)
+        self.train_record = update_model(self.net, self.epoch, self.exp_path, self.exp_name,
+                                         [mae, rmse, loss], self.train_record,
+                                         self.log_txt, cfg.DETAILS)
 
         self.timer['val time'].toc(average=False)
 
-        print_summary(self.epoch, self.exp_name, [mae, rmse, loss],
+        print_summary(self.epoch, self.exp_name,
+                      [mae, rmse, loss],
                       self.train_record,
                       (time_sampe * 1000 / step),
                       self.timer['train time'].diff,

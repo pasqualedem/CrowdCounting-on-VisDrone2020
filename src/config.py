@@ -18,6 +18,7 @@ __C.PRE_TRAINED = None
 __C.EXP_PATH = './exp'
 __C.DATASET = 'VisDrone'
 __C.NET = 'PROVA'
+__C.DETAILS = ''
 
 # learning rate settings
 __C.LR = 1e-4  # learning rate
