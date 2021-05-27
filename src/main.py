@@ -18,7 +18,7 @@ def load_CC():
 def test_net():
     res = evaluate_model(model_function=load_CC,
                          data_function=load_test,
-                         bs=8,
+                         bs=2,
                          n_workers=4,
                          losses={'mse': mean_squared_error, 'mae': mean_absolute_error},
                          )

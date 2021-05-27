@@ -17,13 +17,23 @@ from models.MobileCount import MobileCount
 from models.MobileCountx1_25 import MobileCount as MobileCountx1_25
 from models.MobileCountx2 import MobileCount as MobileCountx2
 from tabulate import tabulate
+from config import cfg
+from models.CC import CrowdCounter
+
+def load_CC():
+    cc = CrowdCounter([0], 'MobileCount')
+    if cfg.PRE_TRAINED:
+        cc.load(cfg.PRE_TRAINED)
+    return cc
+
 
 models = {'vgg16': vgg16,
           'vgg19': vgg19,
           'vgg11': vgg11,
           'MobileCount': MobileCount,
           'MobileCountx1_25': MobileCountx1_25,
-          'MobileCountx2': MobileCountx2
+          'MobileCountx2': MobileCountx2,
+          'CC': load_CC
           }
 
 

@@ -30,8 +30,8 @@ def test_model(
             targets = targets.to(device)
             predictions = model.predict(*inputs)
 
-            count_pr = torch.sum(predictions, dim=(1, 2))
-            count_gt = torch.sum(targets, dim=(1, 2))
+            count_pr = torch.sum(predictions.squeeze(), dim=(1, 2)) / 2550
+            count_gt = torch.sum(targets.squeeze(), dim=(1, 2))
 
             y_pred.extend(count_pr.cpu().tolist())
             y_true.extend(count_gt.cpu().tolist())

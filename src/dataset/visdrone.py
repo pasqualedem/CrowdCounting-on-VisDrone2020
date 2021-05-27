@@ -86,7 +86,7 @@ def make_dataframe(folder):
 
 def load_test():
     df = make_dataframe('../dataset/VisDrone2020-CC/test')
-    ds = VisDroneDataset(df, train=False)
+    ds = VisDroneDataset(df, train=False, gt_transform=False)
     return ds
 
 

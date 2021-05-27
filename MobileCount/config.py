@@ -7,32 +7,33 @@ import torch
 __C = edict()
 cfg = __C
 
-#------------------------------TRAIN------------------------
-__C.SEED = 3035 # random seed,  for reporduction
-__C.DATASET = 'SHHA' # dataset selection: SHHA, SHHB, UCF50, QNRF, WE
+# ------------------------------TRAIN------------------------
+__C.SEED = 3035  # random seed,  for reporduction
+__C.DATASET = 'SHHA'  # dataset selection: SHHA, SHHB, UCF50, QNRF, WE
 
-if __C.DATASET == 'UCF50':# only for UCF50
-	from datasets.UCF50.setting import cfg_data
-	__C.VAL_INDEX = cfg_data.VAL_INDEX 
+if __C.DATASET == 'UCF50':  # only for UCF50
+    from datasets.UCF50.setting import cfg_data
 
-if __C.DATASET == 'GCC':# only for GCC
-	from datasets.GCC.setting import cfg_data
-	__C.VAL_MODE = cfg_data.VAL_MODE 
+    __C.VAL_INDEX = cfg_data.VAL_INDEX
 
+if __C.DATASET == 'GCC':  # only for GCC
+    from datasets.GCC.setting import cfg_data
 
-__C.NET = 'MobileCountx1_25' # net selection: MobileCount, MobileCountx1_25, MobileCountx2
+    __C.VAL_MODE = cfg_data.VAL_MODE
 
-__C.PRE_GCC = False # use the pretrained model on GCC dataset
+__C.NET = 'MobileCountx1_25'  # net selection: MobileCount, MobileCountx1_25, MobileCountx2
+
+__C.PRE_GCC = False  # use the pretrained model on GCC dataset
 # __C.PRE_GCC_MODEL = './exp/04-06_16-19_GCC_CSRNet_0.0001_rd/all_ep_130_mae_34.9_mse_71.9.pth' # path to model
 __C.PRE_GCC_MODEL = 'exp/05-22_20-47_SHHA_MobileCount_0.0001/all_ep_281_mae_93.9_mse_154.4.pth'
 
-__C.GPU_ID = [0] # sigle gpu: [0], [1] ...; multi gpus: [0,1]
+__C.GPU_ID = [0]  # sigle gpu: [0], [1] ...; multi gpus: [0,1]
 
 # learning rate settings
-__C.LR = 1e-4 # learning rate
-__C.LR_DECAY = 0.995 # decay rate
-__C.LR_DECAY_START = -1 # when training epoch is more than it, the learning rate will be begin to decay
-__C.NUM_EPOCH_LR_DECAY = 1 # decay frequency
+__C.LR = 1e-4  # learning rate
+__C.LR_DECAY = 0.995  # decay rate
+__C.LR_DECAY_START = -1  # when training epoch is more than it, the learning rate will be begin to decay
+__C.NUM_EPOCH_LR_DECAY = 1  # decay frequency
 __C.MAX_EPOCH = 500
 __C.INIT_EPOCH = 0
 
@@ -42,28 +43,25 @@ __C.PRINT_FREQ = 10
 now = time.strftime("%m-%d_%H-%M", time.localtime())
 
 __C.EXP_NAME = now \
-			 + '_' + __C.DATASET \
-             + '_' + __C.NET \
-             + '_' + str(__C.LR)
+               + '_' + __C.DATASET \
+               + '_' + __C.NET \
+               + '_' + str(__C.LR)
 
 if __C.DATASET == 'UCF50':
-	__C.EXP_NAME += '_' + str(__C.VAL_INDEX)	
+    __C.EXP_NAME += '_' + str(__C.VAL_INDEX)
 
 if __C.DATASET == 'GCC':
-	__C.EXP_NAME += '_' + __C.VAL_MODE	
+    __C.EXP_NAME += '_' + __C.VAL_MODE
 
-__C.EXP_PATH = './exp' # the path of logs, checkpoints, and current codes
+__C.EXP_PATH = './exp'  # the path of logs, checkpoints, and current codes
 
-
-#------------------------------VAL------------------------
+# ------------------------------VAL------------------------
 __C.VAL_DENSE_START = 1
-__C.VAL_FREQ = 10 # Before __C.VAL_DENSE_START epoches, the freq is set as __C.VAL_FREQ
+__C.VAL_FREQ = 10  # Before __C.VAL_DENSE_START epoches, the freq is set as __C.VAL_FREQ
 
-#------------------------------VIS------------------------
-__C.VISIBLE_NUM_IMGS = 1 #  must be 1 for training images with the different sizes
+# ------------------------------VIS------------------------
+__C.VISIBLE_NUM_IMGS = 1  # must be 1 for training images with the different sizes
 
-
-
-#================================================================================
-#================================================================================
-#================================================================================  
+# ================================================================================
+# ================================================================================
+# ================================================================================
