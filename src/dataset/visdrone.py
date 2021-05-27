@@ -50,10 +50,11 @@ class VisDroneDataset(torch.utils.data.Dataset):
         target_filename = self.dataframe.loc[i]['gt_filename']
 
         # Load the img and the ground truth
-        data = pil.open(filename)
+        with pil.open(filename) as img:
+            data = np.array(img)
         hf = h5py.File(target_filename, 'r')
         target = np.array(hf.get('density'))
-
+        hf.close()
         if self.train_transforms:
             data, target = self.train_transforms(data, target)
 
@@ -84,8 +85,8 @@ def make_dataframe(folder):
 
 
 def load_test():
-    df = make_dataframe('../dataset/VisDrone2020-CC/sequences')
-    ds = VisDroneDataset(df)
+    df = make_dataframe('../dataset/VisDrone2020-CC/test')
+    ds = VisDroneDataset(df, train=False)
     return ds
 
 

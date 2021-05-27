@@ -18,7 +18,7 @@ def generate_heatmap(df, dim):
     for frame in frames:
         heads = df[df['frame'] == frame][['x', 'y']].values
         heatmap = np.zeros(dim)
-        heatmap[np.clip(heads[:, 1], 0, dim[1]) - 1, np.clip(heads[:, 0] - 1, 0, dim[0])] = 1
+        heatmap[np.clip(heads[:, 1], 0, dim[0]) - 1, np.clip(heads[:, 0] - 1, 0, dim[1]) - 1] = 1
         heatmap = gaussian_filter(heatmap, GAMMA)
         heatmaps[frame] = heatmap
     return heatmaps
@@ -54,27 +54,30 @@ def make_ground_truth(folder, img_folder, name_rule, img_rule, dataframe_fun):
 
 if __name__ == '__main__':
     def dataframe_load_test(filename):
-        df = pd.read_csv(filename)
-        df.columns = ['id', 'frame', 'x', 'y', 'width', 'height', 'out', 'occl', 'mistero', 'boh']
+        df = pd.read_csv(filename, header=None)
+        df.columns = ['frame', 'head_id', 'x', 'y', 'width', 'height', 'out', 'occl', 'mistero', 'boh']
         df['x'] = df['x'] + df['width'] // 2
         df['y'] = df['y'] + df['height'] // 2
 
+        df = df[(df['frame'] % 10) == 1]
+        df['frame'] = df['frame'] // 10 + 1
         return df[['frame', 'x', 'y']]
 
 
     def dataframe_load_train(filename):
-        df = pd.read_csv(filename)
+        df = pd.read_csv(filename, header=None)
         df.columns = ['frame', 'x', 'y']
         return df
 
 
+    train_rule = lambda x: '.txt' in x and 'clean' not in x
     test_rule = lambda x: '_clean.txt' in x
 
     img_train_rule = lambda x, y: os.path.join(x, y)
     img_test_rule = lambda x, y: os.path.join(x, re.sub('\_clean$', '', y))
 
-    train = [lambda x: True, img_train_rule, dataframe_load_train]
-    test = [test_rule, img_test_rule, dataframe_load_test]
+    train = [train_rule, img_train_rule, dataframe_load_train]
+    test = [test_rule, img_test_rule, dataframe_load_test,]
 
     make_ground_truth('../dataset/VisDrone2020-CC/annotations',
                       '../dataset/VisDrone2020-CC/test',
