@@ -93,5 +93,5 @@ if __name__ == '__main__':
     test = [test_rule, img_test_rule, dataframe_load_test, size]
 
     make_ground_truth('../dataset/VisDrone2020-CC/annotations',
-                      '../dataset/VisDrone2020-CC/test',
-                      *test)
+                      '../dataset/VisDrone2020-CC/sequences',
+                      *train)
