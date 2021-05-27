@@ -149,6 +149,5 @@ class Trainer:
 
         self.train_record = update_model(self.net, self.epoch, self.exp_path, self.exp_name, [mae, rmse, loss],
                                          self.train_record, self.log_txt)
-        print_summary(self.exp_name, [mae, rmse, loss], self.train_record)
+        print_summary(self.exp_name, [mae, rmse, loss], self.train_record, time_sampe * 1000 / step)
         self.score = rmse
-        print('\nForward Time: %fms' % (time_sampe * 1000 / step))

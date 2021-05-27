@@ -1,6 +1,13 @@
-import torch
 import numpy as np
+import os
+import time
 
+import torch
+from torch import nn
+import torchvision.utils as vutils
+import torchvision.transforms as standard_transforms
+
+from tensorboardX import SummaryWriter
 
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given number of consecutive epochs"""
@@ -38,18 +45,6 @@ class EarlyStopping:
         if self.counter >= self.patience:
             self.should_stop = True
         return self.should_stop
-
-
-import numpy as np
-import os
-import time
-
-import torch
-from torch import nn
-import torchvision.utils as vutils
-import torchvision.transforms as standard_transforms
-
-from tensorboardX import SummaryWriter
 
 
 def initialize_weights(models):
@@ -121,36 +116,13 @@ def logger_txt(log_file, epoch, scores):
         f.write('=' * 15 + '+' * 15 + '=' * 15 + '\n\n')
 
 
-def vis_results(exp_name, epoch, writer, restore, img, pred_map, gt_map):
-    pil_to_tensor = standard_transforms.ToTensor()
-
-    x = []
-
-    for idx, tensor in enumerate(zip(img.cpu().data, pred_map, gt_map)):
-        if idx > 1:  # show only one group
-            break
-        pil_input = restore(tensor[0])
-        pil_output = torch.from_numpy(tensor[1] / (tensor[2].max() + 1e-10)).repeat(3, 1, 1)
-        pil_label = torch.from_numpy(tensor[2] / (tensor[2].max() + 1e-10)).repeat(3, 1, 1)
-        x.extend([pil_to_tensor(pil_input.convert('RGB')), pil_label, pil_output])
-    x = torch.stack(x, 0)
-    x = vutils.make_grid(x, nrow=3, padding=5)
-    x = (x.numpy() * 255).astype(np.uint8)
-
-    writer.add_image(exp_name + '_epoch_' + str(epoch + 1), x)
-
-
-def print_summary(exp_name, scores, train_record):
+def print_summary(epoch, exp_name, scores, train_record, for_time):
     mae, mse, loss = scores
-    print('=' * 50)
-    print(exp_name)
-    print('    ' + '-' * 20)
-    print('    [mae %.2f mse %.2f], [val loss %.4f]' % (mae, mse, loss))
-    print('    ' + '-' * 20)
+    print('Epoch '+ str(epoch) + ('=' * 15) + 'VALIDATED' + ('=' * 25))
+    print(str(exp_name) + '    [mae %.2f mse %.2f], [val loss %.4f] [forward time %.2f]' % (mae, mse, loss, for_time))
     print('[best] [model: %s] , [mae %.2f], [mse %.2f]' % (train_record['best_model_name'],
                                                            train_record['best_mae'],
                                                            train_record['best_rmse']))
-    print('=' * 50)
 
 
 def update_model(net, epoch, exp_path, exp_name, scores, train_record, log_file):
