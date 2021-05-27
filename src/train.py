@@ -1,6 +1,3 @@
-import numpy as np
-
-import torch
 from torch import optim
 from torch.optim.lr_scheduler import StepLR
 
@@ -46,15 +43,9 @@ class Trainer:
             self.forward_dataset()
             self.timer['train time'].toc(average=False)
 
-            print('train time: {:.2f}s'.format(self.timer['train time'].diff))
-            print('=' * 20)
-
             # validation
             if epoch % cfg.VAL_FREQ == 0 or epoch > cfg.VAL_DENSE_START:
-                self.timer['val time'].tic()
                 self.validate()
-                self.timer['val time'].toc(average=False)
-                print('val time: {:.2f}s'.format(self.timer['val time'].diff))
 
             if early_stop(self.score):
                 print('Early stopped! At epoch' + str(self.epoch))
@@ -68,7 +59,7 @@ class Trainer:
         norm_pred_count = 0
 
         tk_train = tqdm(
-            enumerate(self.train_loader, 0), total=len(self.train_loader), leave=False, bar_format='{l_bar}{bar:32}{r_bar}',
+            enumerate(self.train_loader, 0), total=len(self.train_loader), leave=False,bar_format='{l_bar}{bar:32}{r_bar}',
             colour='#ff0de7', desc='Train Epoch %d/%d' % (self.epoch + 1, cfg.MAX_EPOCH)
         )
         postfix = {'loss': out_loss, 'lr': self.optimizer.param_groups[0]['lr'],
@@ -100,6 +91,7 @@ class Trainer:
                 tk_train.set_postfix(postfix, refresh=True)
 
     def validate(self):
+        self.timer['val time'].tic()
 
         self.net.eval()
 
@@ -149,5 +141,12 @@ class Trainer:
 
         self.train_record = update_model(self.net, self.epoch, self.exp_path, self.exp_name, [mae, rmse, loss],
                                          self.train_record, self.log_txt)
-        print_summary(self.epoch, self.exp_name, [mae, rmse, loss], self.train_record)
+
+        self.timer['val time'].toc(average=False)
+
+        print_summary(self.epoch, self.exp_name, [mae, rmse, loss],
+                      self.train_record,
+                      (time_sampe * 1000 / step),
+                      self.timer['train time'].diff,
+                      self.timer['val time'].diff)
         self.score = rmse

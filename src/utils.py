@@ -116,10 +116,13 @@ def logger_txt(log_file, epoch, scores):
         f.write('=' * 15 + '+' * 15 + '=' * 15 + '\n\n')
 
 
-def print_summary(epoch, exp_name, scores, train_record, for_time):
+def print_summary(epoch, exp_name, scores, train_record, for_time, train_time, val_time):
     mae, mse, loss = scores
-    print('Epoch '+ str(epoch) + ('=' * 15) + 'VALIDATED' + ('=' * 25))
-    print(str(exp_name) + '    [mae %.2f mse %.2f], [val loss %.4f] [forward time %.2f]' % (mae, mse, loss, for_time))
+    print('\n' + 'Epoch ' + str(epoch) + ' | ', end='')
+    print(str(exp_name) +
+          '    [mae %.2f mse %.2f], [val loss %.4f] [forward time %.2f] [train/valid time %.2f / %.2f] --- '
+          % (mae, mse, loss, for_time, train_time, val_time),
+          end='')
     print('[best] [model: %s] , [mae %.2f], [mse %.2f]' % (train_record['best_model_name'],
                                                            train_record['best_mae'],
                                                            train_record['best_rmse']))
