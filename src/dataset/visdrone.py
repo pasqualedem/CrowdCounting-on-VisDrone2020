@@ -5,6 +5,7 @@ import torch
 import torchvision
 from PIL import Image as pil
 import h5py
+import re
 from config import cfg
 from easydict import EasyDict
 import sklearn.model_selection
@@ -12,7 +13,7 @@ import transformations as trans
 
 cfg_data = EasyDict()
 
-cfg_data.SIZE = ()
+cfg_data.SIZE = (540, 960)
 cfg_data.FILE_EXTENSION = '.jpg'
 cfg_data.GT_FILE_EXTENSION = '.h5'
 cfg_data.LOG_PARA = 2550.0
@@ -35,6 +36,7 @@ class VisDroneDataset(torch.utils.data.Dataset):
             self.img_transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
                                                                  torchvision.transforms.Normalize(mean=MEAN,
                                                                                                   std=STD),
+                                                                 torchvision.transforms.Resize(cfg_data.SIZE)
                                                                  ])  # normalize to (-1, 1)
         if gt_transform:
             self.gt_transform = torchvision.transforms.Compose([
@@ -79,7 +81,8 @@ def make_dataframe(folder):
         for file in files:
             if cfg_data.FILE_EXTENSION in file:
                 idx, ext = file.split('.')
-                gt = os.path.join(folder, cur_folder, idx + cfg_data.GT_FILE_EXTENSION)
+                gt = os.path.join(folder, cur_folder,
+                                  idx + re.sub(', |\(|\)', '_', str(cfg_data.SIZE)) + cfg_data.GT_FILE_EXTENSION)
                 dataset.append([idx, os.path.join(folder, cur_folder, file), gt])
     return pd.DataFrame(dataset, columns=['id', 'filename', 'gt_filename'])
 
