@@ -140,8 +140,9 @@ def vis_results(exp_name, epoch, writer, restore, img, pred_map, gt_map):
     writer.add_image(exp_name + '_epoch_' + str(epoch + 1), x)
 
 
-def print_summary(exp_name, scores, train_record):
+def print_summary(epoch, exp_name, scores, train_record):
     mae, mse, loss = scores
+    print('Epoch:' + str(epoch))
     print('=' * 50)
     print(exp_name)
     print('    ' + '-' * 20)

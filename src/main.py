@@ -9,7 +9,7 @@ import torch
 
 
 def load_CC():
-    cc = CrowdCounter([0], 'MobileCountx2')
+    cc = CrowdCounter([0], 'MobileCountx1_25')
     if cfg.PRE_TRAINED:
         cc.load(cfg.PRE_TRAINED)
     return cc
