@@ -82,7 +82,7 @@ def make_dataframe(folder):
             if cfg_data.FILE_EXTENSION in file:
                 idx, ext = file.split('.')
                 gt = os.path.join(folder, cur_folder,
-                                  idx + re.sub(', |\(|\)', '_', str(cfg_data.SIZE)) + cfg_data.GT_FILE_EXTENSION)
+                                  idx + re.sub(', |\(|\)|\[|\]', '_', str(cfg_data.SIZE)) + cfg_data.GT_FILE_EXTENSION)
                 dataset.append([idx, os.path.join(folder, cur_folder, file), gt])
     return pd.DataFrame(dataset, columns=['id', 'filename', 'gt_filename'])
 
