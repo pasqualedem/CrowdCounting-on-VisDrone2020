@@ -209,7 +209,7 @@ class MobileCount(nn.Module):
         x4 = self.relu(x4)
         x4 = self.mflow_conv_g1_pool(x4)
         x4 = self.mflow_conv_g1_b3_joint_varout_dimred(x4)
-        x4 = nn.Upsample(size=l3.size()[2:], mode='bilinear', align_corners=True)(x4)
+        x4 = nn.Upsample(size=l3.size()[2:], mode='bilinear')(x4)
 
         l3 = self.dropout3(l3)
         x3 = self.p_ims1d2_outl2_dimred(l3)
@@ -237,7 +237,7 @@ class MobileCount(nn.Module):
         x1 = self.dropout_clf(x1)
         out = self.clf_conv(x1)
 
-        out = F.interpolate(out, size=size1, mode='bilinear')
+        out = F.interpolate(out, size=size1, mode='bilinear', align_corners=False)
 
         return out
 
