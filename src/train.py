@@ -17,9 +17,18 @@ class Trainer:
 
         self.net_name = cfg.NET
         self.net = net_fun()
+
         self.optimizer = optim.Adam(self.net.parameters(), lr=cfg.LR, weight_decay=1e-4)
         # self.optimizer = optim.SGD(self.net.parameters(), cfg.LR, momentum=0.95,weight_decay=5e-4)
         self.scheduler = StepLR(self.optimizer, step_size=cfg.NUM_EPOCH_LR_DECAY, gamma=cfg.LR_DECAY)
+
+        if cfg.PRE_TRAINED:
+            checkpoint = torch.load(cfg.PRE_TRAINED)
+            self.net.load_state_dict(checkpoint['model_state_dict'])
+            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+            self.epoch = checkpoint['epoch']
+            self.loss = checkpoint['loss']
 
         self.train_record = {'best_mae': 1e20, 'best_rmse': 1e20, 'best_model_name': ''}
         self.timer = {'iter time': Timer(), 'train time': Timer(), 'val time': Timer()}
@@ -139,7 +148,13 @@ class Trainer:
         self.writer.add_scalar('mae', mae, self.epoch + 1)
         self.writer.add_scalar('rmse', rmse, self.epoch + 1)
 
-        self.train_record = update_model(self.net, self.epoch, self.exp_path, self.exp_name,
+        self.train_record = update_model({'model_state_dict': self.net.state_dict(),
+                                          'optimizer_state_dict': self.optimizer.state_dict(),
+                                          'scheduler_state_dict': self.scheduler.state_dict(),
+                                          'epoch': self.epoch,
+                                          'loss': self.loss
+                                          },
+                                         self.epoch, self.exp_path, self.exp_name,
                                          [mae, rmse, loss], self.train_record,
                                          self.log_txt)
 

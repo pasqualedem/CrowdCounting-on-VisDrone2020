@@ -4,8 +4,6 @@ import time
 
 import torch
 from torch import nn
-import torchvision.utils as vutils
-import torchvision.transforms as standard_transforms
 
 from tensorboardX import SummaryWriter
 
@@ -128,7 +126,7 @@ def print_summary(epoch, exp_name, scores, train_record, for_time, train_time, v
                                                            train_record['best_rmse']))
 
 
-def update_model(net, epoch, exp_path, exp_name, scores, train_record, log_file):
+def update_model(state_dict, epoch, exp_path, exp_name, scores, train_record, log_file):
     mae, rmse, loss = scores
 
     snapshot_name = 'all_ep_%d_mae_%.1f_rmse_%.1f' % (epoch + 1, mae, rmse)
@@ -136,7 +134,7 @@ def update_model(net, epoch, exp_path, exp_name, scores, train_record, log_file)
 
     if mae < train_record['best_mae'] or rmse < train_record['best_rmse']:
         train_record['best_model_name'] = snapshot_name
-        to_saved_weight = net.state_dict()
+        to_saved_weight = state_dict.state_dict()
         torch.save(to_saved_weight, os.path.join(exp_path, exp_name, snapshot_name + '.pth'))
 
     if mae < train_record['best_mae']:

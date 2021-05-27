@@ -13,7 +13,7 @@ import transformations as trans
 
 cfg_data = EasyDict()
 
-cfg_data.SIZE = (1080, 1920)
+cfg_data.SIZE = (540, 960)
 cfg_data.FILE_EXTENSION = '.jpg'
 cfg_data.GT_FILE_EXTENSION = '.h5'
 cfg_data.LOG_PARA = 2550.0

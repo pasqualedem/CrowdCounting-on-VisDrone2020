@@ -11,7 +11,7 @@ __C.TRAIN_BATCH_SIZE = 2
 __C.VAL_BATCH_SIZE = 6
 __C.N_WORKERS = 4
 
-__C.PRE_TRAINED = None
+__C.PRE_TRAINED = '../src/exp/05-27_15-15_VisDrone_MobileCount_0.0001/all_ep_52_mae_7.2_rmse_9.3_aligncorners=true_dimensionipiccole.pth'
 
 # path settings
 __C.EXP_PATH = './exp'
@@ -25,7 +25,6 @@ __C.LR_DECAY = 0.995  # decay rate
 __C.LR_DECAY_START = -1  # when training epoch is more than it, the learning rate will be begin to decay
 __C.NUM_EPOCH_LR_DECAY = 1  # decay frequency
 __C.MAX_EPOCH = 500
-__C.INIT_EPOCH = 0
 
 __C.PATIENCE = 15
 __C.EARLY_STOP_DELTA = 1e-2
