@@ -9,6 +9,8 @@ class CrowdCounter(nn.Module):
     def __init__(self, gpus, model_name):
         super(CrowdCounter, self).__init__()
 
+        if model_name == 'MobileCountx0_5':
+            from models.MobileCountx0_5 import MobileCount as net
         if model_name == 'MobileCount':
             from models.MobileCount import MobileCount as net
         elif model_name == 'MobileCountx1_25':
