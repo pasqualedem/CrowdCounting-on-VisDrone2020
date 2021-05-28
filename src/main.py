@@ -47,7 +47,7 @@ def test_net():
                          data_function=load_test,
                          bs=4,
                          n_workers=2,
-                         losses={'mse': mean_squared_error, 'mae': mean_absolute_error},
+                         losses={'rmse': lambda x, y: mean_squared_error(x, y, squared=False), 'mae': mean_absolute_error},
                          )
     print(res)
 
@@ -67,4 +67,4 @@ if __name__ == '__main__':
         torch.manual_seed(seed)
         torch.cuda.manual_seed(seed)
 
-    train_net()
+    test_net()
