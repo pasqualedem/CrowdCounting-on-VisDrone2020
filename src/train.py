@@ -18,9 +18,11 @@ class Trainer:
         self.net_name = cfg.NET
         self.net = net_fun()
 
-        self.optimizer = optim.Adam(self.net.parameters(), lr=cfg.LR, weight_decay=1e-4)
-        # self.optimizer = optim.SGD(self.net.parameters(), cfg.LR, momentum=0.95,weight_decay=5e-4)
+        # self.optimizer = optim.Adam(self.net.parameters(), lr=cfg.LR, weight_decay=1e-4)
+        self.optimizer = optim.SGD(self.net.parameters(), cfg.LR, momentum=0.95,weight_decay=5e-4)
         self.scheduler = StepLR(self.optimizer, step_size=cfg.NUM_EPOCH_LR_DECAY, gamma=cfg.LR_DECAY)
+        self.epoch = -1
+        self.score = np.nan
 
         if cfg.PRE_TRAINED:
             checkpoint = torch.load(cfg.PRE_TRAINED)
@@ -28,21 +30,19 @@ class Trainer:
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
             self.epoch = checkpoint['epoch']
-            self.loss = checkpoint['loss']
+            self.score = checkpoint['val loss']
 
         self.train_record = {'best_mae': 1e20, 'best_rmse': 1e20, 'best_model_name': ''}
         self.timer = {'iter time': Timer(), 'train time': Timer(), 'val time': Timer()}
         self.writer, self.log_txt = logger(self.exp_path, self.exp_name)
 
-        self.score = np.nan
         self.i_tb = 0
-        self.epoch = -1
 
         self.train_loader, self.val_loader = dataloader()
 
     def train(self):
         early_stop = EarlyStopping(patience=cfg.PATIENCE, delta=cfg.EARLY_STOP_DELTA)
-        for epoch in range(cfg.INIT_EPOCH, cfg.MAX_EPOCH):
+        for epoch in range(0, cfg.MAX_EPOCH):
             self.epoch = epoch
             if epoch > cfg.LR_DECAY_START:
                 self.scheduler.step()
@@ -152,7 +152,7 @@ class Trainer:
                                           'optimizer_state_dict': self.optimizer.state_dict(),
                                           'scheduler_state_dict': self.scheduler.state_dict(),
                                           'epoch': self.epoch,
-                                          'loss': self.loss
+                                          'val loss': self.score
                                           },
                                          self.epoch, self.exp_path, self.exp_name,
                                          [mae, rmse, loss], self.train_record,
