@@ -18,8 +18,8 @@ class Trainer:
         self.net_name = cfg.NET
         self.net = net_fun()
 
-        # self.optimizer = optim.Adam(self.net.parameters(), lr=cfg.LR, weight_decay=1e-4)
-        self.optimizer = optim.SGD(self.net.parameters(), cfg.LR, momentum=0.95,weight_decay=5e-4)
+        self.optimizer = optim.Adam(self.net.parameters(), lr=cfg.LR, weight_decay=1e-4)
+        # self.optimizer = optim.SGD(self.net.parameters(), cfg.LR, momentum=0.95,weight_decay=5e-4)
         self.scheduler = StepLR(self.optimizer, step_size=cfg.NUM_EPOCH_LR_DECAY, gamma=cfg.LR_DECAY)
         self.epoch = -1
         self.score = np.nan
@@ -42,7 +42,7 @@ class Trainer:
 
     def train(self):
         early_stop = EarlyStopping(patience=cfg.PATIENCE, delta=cfg.EARLY_STOP_DELTA)
-        for epoch in range(0, cfg.MAX_EPOCH):
+        for epoch in range(self.epoch, cfg.MAX_EPOCH):
             self.epoch = epoch
             if epoch > cfg.LR_DECAY_START:
                 self.scheduler.step()
@@ -57,7 +57,7 @@ class Trainer:
                 self.validate()
 
             if early_stop(self.score):
-                print('Early stopped! At epoch' + str(self.epoch))
+                print('Early stopped! At epoch ' + str(self.epoch))
                 break
 
     def forward_dataset(self):  # training for all datasets

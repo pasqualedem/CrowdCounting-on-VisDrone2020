@@ -7,16 +7,16 @@ cfg = __C
 __C.SEED = 3035  # random seed
 
 # System settings
-__C.TRAIN_BATCH_SIZE = 2
+__C.TRAIN_BATCH_SIZE = 4
 __C.VAL_BATCH_SIZE = 6
 __C.N_WORKERS = 4
 
-__C.PRE_TRAINED = 'exp/05-27_18-12_VisDrone_MobileCount_0.0001__1080x1920/all_ep_16_mae_9.8_rmse_12.8.pth'
+__C.PRE_TRAINED = None
 
 # path settings
 __C.EXP_PATH = './exp'
 __C.DATASET = 'VisDrone'
-__C.NET = 'MobileCount'
+__C.NET = 'MobileCountx0_5'
 __C.DETAILS = '_1080x1920'
 
 # learning rate settings
@@ -26,7 +26,7 @@ __C.LR_DECAY_START = -1  # when training epoch is more than it, the learning rat
 __C.NUM_EPOCH_LR_DECAY = 1  # decay frequency
 __C.MAX_EPOCH = 500
 
-__C.PATIENCE = 15
+__C.PATIENCE = 40
 __C.EARLY_STOP_DELTA = 1e-2
 
 # print
