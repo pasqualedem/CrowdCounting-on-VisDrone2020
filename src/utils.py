@@ -134,8 +134,7 @@ def update_model(state_dict, epoch, exp_path, exp_name, scores, train_record, lo
 
     if mae < train_record['best_mae'] or rmse < train_record['best_rmse']:
         train_record['best_model_name'] = snapshot_name
-        to_saved_weight = state_dict.state_dict()
-        torch.save(to_saved_weight, os.path.join(exp_path, exp_name, snapshot_name + '.pth'))
+        torch.save(state_dict, os.path.join(exp_path, exp_name, snapshot_name + '.pth'))
 
     if mae < train_record['best_mae']:
         train_record['best_mae'] = mae

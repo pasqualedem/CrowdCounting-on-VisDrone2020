@@ -87,7 +87,7 @@ if __name__ == '__main__':
     img_train_rule = lambda x, y: os.path.join(x, y)
     img_test_rule = lambda x, y: os.path.join(x, re.sub('\_clean$', '', y))
 
-    size = (1080, 1920)
+    size = (540, 960)
 
     train = [train_rule, img_train_rule, dataframe_load_train, size]
     test = [test_rule, img_test_rule, dataframe_load_test, size]
