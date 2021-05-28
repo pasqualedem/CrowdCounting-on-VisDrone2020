@@ -7,7 +7,7 @@ class RandomDataset(torch.utils.data.Dataset):
         self.n = n
 
     def __getitem__(self, item):
-        return torch.rand(self.dim).cuda()
+        return torch.rand(self.dim)
 
     def __len__(self):
         return self.n

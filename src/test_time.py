@@ -42,7 +42,7 @@ def measure_forward(model, x):
     torch.cuda.synchronize()
     t0 = time.perf_counter()
     with torch.no_grad():
-        y_pred = model.predict(x)
+        y_pred = model.predict(x.cuda())
     torch.cuda.synchronize()
     elapsed_fp = time.perf_counter() - t0
 
@@ -55,7 +55,7 @@ def measure_fps(model, dataset):
     t0 = time.perf_counter()
     with torch.no_grad():
         for x in dataset:
-            _ = model.predict(x)
+            _ = model.predict(x.cuda())
     torch.cuda.synchronize()
     elapsed_fp = time.perf_counter() - t0
 
