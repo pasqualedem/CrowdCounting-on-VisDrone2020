@@ -20,20 +20,27 @@ from config import cfg
 from models.CC import CrowdCounter
 from dataset.random import RandomDataset
 
-def load_CC():
-    cc = CrowdCounter([0], 'MobileCount')
+
+def load_CC(MC):
+    cc = CrowdCounter([0], MC)
     if cfg.PRE_TRAINED:
         cc.load(cfg.PRE_TRAINED)
     return cc
 
 
+def load_CC05(): return load_CC('MobileCountx0_5')
+def load_CC1(): return load_CC('MobileCount')
+def load_CC125(): return load_CC('MobileCountx1_25')
+def load_CC2(): return load_CC('MobileCountx2')
+
+
 models = {'vgg16': vgg16,
           'vgg19': vgg19,
           'vgg11': vgg11,
-          'MobileCount': MobileCount,
-          'MobileCountx1_25': MobileCountx1_25,
-          'MobileCountx2': MobileCountx2,
-          'CC': load_CC
+          'CC05': load_CC05,
+          'CC1': load_CC1,
+          'CC125': load_CC125,
+          'CC2': load_CC2
           }
 
 

@@ -11,7 +11,7 @@ __C.TRAIN_BATCH_SIZE = 4
 __C.VAL_BATCH_SIZE = 6
 __C.N_WORKERS = 4
 
-__C.PRE_TRAINED = 'exp/05-28_19-41_VisDrone_MobileCountx0_5_0.0001__1080x1920_SGD/all_ep_11_mae_68.5_rmse_88.1.pth'
+__C.PRE_TRAINED = 'exp/05-29_00-11_VisDrone_MobileCountx0_5_0.0001__1080x1920/all_ep_15_mae_12.2_rmse_15.9.pth'
 
 # path settings
 __C.EXP_PATH = './exp'
