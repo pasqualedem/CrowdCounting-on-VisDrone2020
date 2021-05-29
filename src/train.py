@@ -69,7 +69,7 @@ class Trainer:
 
         tk_train = tqdm(
             enumerate(self.train_loader, 0), total=len(self.train_loader), leave=False,bar_format='{l_bar}{bar:32}{r_bar}',
-            colour='#ff0de7', desc='Train Epoch %d/%d' % (self.epoch + 1, cfg.MAX_EPOCH)
+            colour='#ff0de7', desc='Train Epoch %d/%d' % (self.epoch, cfg.MAX_EPOCH)
         )
         postfix = {'loss': out_loss, 'lr': self.optimizer.param_groups[0]['lr'],
                    'time': time, 'gt count': norm_gt_count, 'pred count': norm_pred_count}
