@@ -11,13 +11,13 @@ __C.TRAIN_BATCH_SIZE = 4
 __C.VAL_BATCH_SIZE = 6
 __C.N_WORKERS = 4
 
-__C.PRE_TRAINED = None
+__C.PRE_TRAINED = 'exp/05-28_19-41_VisDrone_MobileCountx0_5_0.0001__1080x1920_SGD/all_ep_11_mae_68.5_rmse_88.1.pth'
 
 # path settings
 __C.EXP_PATH = './exp'
 __C.DATASET = 'VisDrone'
 __C.NET = 'MobileCountx0_5'
-__C.DETAILS = '_1080x1920'
+__C.DETAILS = '_1080x1920_SGDpt2'
 
 # learning rate settings
 __C.LR = 1e-4  # learning rate
