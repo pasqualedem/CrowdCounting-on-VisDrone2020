@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 optimizers = {
     'Adam': optim.Adam,
-    'SGS': optim.SGD
+    'SGD': optim.SGD
 }
 
 
@@ -56,6 +56,7 @@ class Trainer:
         """
         Train the model on the dataset using the parameters of the config file.
         """
+        print("Experiment: " + self.exp_name)
         early_stop = EarlyStopping(patience=cfg.PATIENCE, delta=cfg.EARLY_STOP_DELTA)
         for epoch in range(self.epoch, cfg.MAX_EPOCH):
             self.epoch = epoch
@@ -185,7 +186,7 @@ class Trainer:
 
         self.timer['val time'].toc(average=False)
 
-        print_summary(self.epoch, self.exp_name,
+        print_summary(self.epoch,
                       [mae, rmse, loss],
                       self.train_record,
                       (time_sampe * 1000 / step),
