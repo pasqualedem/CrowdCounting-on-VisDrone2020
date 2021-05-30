@@ -12,9 +12,6 @@ import gc
 import torch
 import torch.backends.cudnn as cudnn
 from torchvision.models import vgg16, vgg19, vgg11
-from models.MobileCount import MobileCount
-from models.MobileCountx1_25 import MobileCount as MobileCountx1_25
-from models.MobileCountx2 import MobileCount as MobileCountx2
 from tabulate import tabulate
 from config import cfg
 from models.CC import CrowdCounter
@@ -45,6 +42,13 @@ models = {'vgg16': vgg16,
 
 
 def measure_forward(model, x):
+    """
+    Measure the time for executing the the given tensor
+
+    @param model: The model for measuring
+    @param dataset: The tensor for measuring
+    @return: Time elapsed for the execution
+    """
     # synchronize gpu time and measure fp
     torch.cuda.synchronize()
     t0 = time.perf_counter()
@@ -57,6 +61,13 @@ def measure_forward(model, x):
 
 
 def measure_fps(model, dataset):
+    """
+    Measure the time for executing the whole dataset
+
+    @param model: The model for measuring
+    @param dataset: The dataset for measuring
+    @return: Time elapsed for the execution
+    """
     # synchronize gpu time and measure fp
     torch.cuda.synchronize()
     t0 = time.perf_counter()
@@ -70,7 +81,15 @@ def measure_fps(model, dataset):
 
 
 def benchmark_forward(model, x, num_runs, num_warmup_runs):
+    """
+    Bench the forward time of the given model on the item
 
+    @param model: the model to bench
+    @param x: Tensor
+    @param num_runs: number of runs to test
+    @param num_warmup_runs: number of warmup forwards before every test
+    @return: list of time for executing a forward
+    """
     print('\nStarting warmup')
     # DRY RUNS
     for i in tqdm(range(num_warmup_runs)):
@@ -91,7 +110,15 @@ def benchmark_forward(model, x, num_runs, num_warmup_runs):
 
 
 def benchmark_fps(model, dataset, num_runs, num_warmup_runs):
+    """
+    Bench the fps of the given model on the given dataset
 
+    @param model: the model to bench
+    @param dataset: DataLoader object
+    @param num_runs: number of runs to test
+    @param num_warmup_runs: number of warmup forwards before every test
+    @return: list of time for executing a test
+    """
     print('\nStarting warmup')
     # DRY RUNS
     x = None
@@ -105,19 +132,28 @@ def benchmark_fps(model, dataset, num_runs, num_warmup_runs):
     print('\nDone, now benchmarking')
 
     # START BENCHMARKING
-    t_forward = []
+    t_run = []
     for i in tqdm(range(num_runs)):
         t_fp = measure_fps(model, dataset)
-        t_forward.append(t_fp)
+        t_run.append(t_fp)
 
     # free memory
     del model
 
-    return t_forward
+    return t_run
 
 
 class Benchmarker:
     def __init__(self, model, dataset, batch_sizes, out_file, n_workers):
+        """
+        Initialize a Benchmarker object
+
+        @param model: the Pytorch model to test
+        @param dataset: Dataset object where to execute the test
+        @param batch_sizes: Batch sizes list for executing the test
+        @param out_file: output file for saving the results
+        @param n_workers: number of workers for loading the dataset examples
+        """
         torch.manual_seed(1234)
         cudnn.benchmark = True
         # transfer the model on GPU
@@ -128,7 +164,13 @@ class Benchmarker:
         self.n_workers = n_workers
 
     def bench_forward(self, num_runs, num_warmup_runs):
+        """
+        Bench the forward time of the model averaging through num_runs, output the results on the stdout
+        and eventually on file
 
+        @param num_runs: the number of runs to execute
+        @param num_warmup_runs: warmup forward before a run
+        """
         mean_tfp = []
         std_tfp = []
         for i, bs in enumerate(self.batch_sizes):
@@ -148,7 +190,13 @@ class Benchmarker:
         gc.collect()
 
     def bench_fps(self, num_runs, num_warmup_runs):
+        """
+        Bench the fps count of the model averaging through num_runs, output the results on the stdout
+        and eventually on file
 
+        @param num_runs: the number of runs to execute
+        @param num_warmup_runs: warmup forward before a run
+        """
         mean_fps = []
         std_fps = []
         for i, bs in enumerate(self.batch_sizes):
@@ -167,6 +215,11 @@ class Benchmarker:
         gc.collect()
 
     def out_results(self, dictionary):
+        """
+        Prints results on the stdout and on file if defined
+
+        @param dictionary: dictionary of results
+        """
         df = pd.DataFrame(dictionary, index=self.batch_sizes)
         size = 'Input size: ' + str(self.dataset.shape())
         table = tabulate(df, headers='keys', tablefmt='psql')

@@ -13,7 +13,7 @@ import transformations as trans
 
 cfg_data = EasyDict()
 
-cfg_data.SIZE = (1080, 1920)
+cfg_data.SIZE = (540, 960)
 cfg_data.FILE_EXTENSION = '.jpg'
 cfg_data.GT_FILE_EXTENSION = '.h5'
 cfg_data.LOG_PARA = 2550.0
@@ -47,6 +47,12 @@ class VisDroneDataset(torch.utils.data.Dataset):
         return len(self.dataframe)
 
     def __getitem__(self, i):
+        """
+        Retrieve, load and preprocess an item of the dataset and its ground truth
+
+        @param i: the id in the dataframe of the item
+        @return: data and ground truth tensors
+        """
         # Obtain the filename and target
         filename = self.dataframe.loc[i]['filename']
         target_filename = self.dataframe.loc[i]['gt_filename']
@@ -73,7 +79,13 @@ class VisDroneDataset(torch.utils.data.Dataset):
 
 
 def make_dataframe(folder):
-    # Return a DataFrame with columns (example folder, example idx, filename, gt filename)
+    """
+    Given a folder requiring to have subfolders each one containing the the frames and the h5 groundtruth,
+    builds a dataframe tracking all the dataset files
+
+    @param folder: the path folder from where build the dataframe
+    @return: a DataFrame with columns (example folder, example idx, filename, gt filename)
+    """
     folders = os.listdir(folder)
     dataset = []
     for cur_folder in folders:
@@ -88,12 +100,22 @@ def make_dataframe(folder):
 
 
 def load_test():
+    """
+    Create a VisDroneDataset object in test mode
+    @return: the visdrone testset
+    """
     df = make_dataframe('../dataset/VisDrone2020-CC/test')
     ds = VisDroneDataset(df, train=False, gt_transform=False)
     return ds
 
 
 def load_train_val():
+    """
+    Create a train and validation DataLoader from the specified folder
+    config values are used (VAL_SIZE, VAL_BATCH_SIZE, N_WORKERS)
+
+    @return: the train and validation DataLoader
+    """
     df = make_dataframe('../dataset/VisDrone2020-CC/sequences')
 
     # Split the dataframe in train and validation

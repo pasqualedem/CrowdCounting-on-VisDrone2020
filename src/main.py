@@ -14,7 +14,7 @@ def load_CC_train():
 
 
 def load_CC_test():
-    cc = CrowdCounter([0], 'MobileCountx0_5')
+    cc = CrowdCounter([0], 'MobileCountx0_75')
     if cfg.PRE_TRAINED:
         cc.load(cfg.PRE_TRAINED)
     return cc

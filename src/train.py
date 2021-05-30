@@ -7,8 +7,21 @@ import time
 from tqdm import tqdm
 
 
+optimizers = {
+    'Adam': optim.Adam,
+    'SGS': optim.SGD
+}
+
+
 class Trainer:
     def __init__(self, dataloader, cfg_data, net_fun):
+        """
+        Initialize the training object with the given parameters and the parameters in the config.py file
+
+        @param dataloader: DataLoader object that iterates the dataset
+        @param cfg_data: config data EasyDict object
+        @param net_fun: functions the called without parameters, returns the model
+        """
 
         self.cfg_data = cfg_data
 
@@ -18,8 +31,7 @@ class Trainer:
         self.net_name = cfg.NET
         self.net = net_fun()
 
-        self.optimizer = optim.Adam(self.net.parameters(), lr=cfg.LR, weight_decay=1e-4)
-        # self.optimizer = optim.SGD(self.net.parameters(), cfg.LR, momentum=0.95,weight_decay=5e-4)
+        self.optimizer = optimizers[cfg.OPTIM[0]](self.net.parameters(), **cfg.OPTIM[1])
         self.scheduler = StepLR(self.optimizer, step_size=cfg.NUM_EPOCH_LR_DECAY, gamma=cfg.LR_DECAY)
         self.epoch = 0
         self.score = np.nan
@@ -41,6 +53,9 @@ class Trainer:
         self.train_loader, self.val_loader = dataloader()
 
     def train(self):
+        """
+        Train the model on the dataset using the parameters of the config file.
+        """
         early_stop = EarlyStopping(patience=cfg.PATIENCE, delta=cfg.EARLY_STOP_DELTA)
         for epoch in range(self.epoch, cfg.MAX_EPOCH):
             self.epoch = epoch
@@ -60,7 +75,10 @@ class Trainer:
                 print('Early stopped! At epoch ' + str(self.epoch))
                 break
 
-    def forward_dataset(self):  # training for all datasets
+    def forward_dataset(self):
+        """
+        Makes a training epoch forwarding the whole dataset. Prints live results using tqdm
+        """
         self.net.train()
         out_loss = 0
         time = 0
@@ -100,6 +118,12 @@ class Trainer:
                 tk_train.set_postfix(postfix, refresh=True)
 
     def validate(self):
+        """
+        Makes a validation step.
+        Validates the model on the validation set, measures the metrics printing it
+        and eventually save a checkpoint of the model
+
+        """
         self.timer['val time'].tic()
 
         self.net.eval()
