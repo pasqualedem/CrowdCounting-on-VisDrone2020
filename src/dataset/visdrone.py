@@ -112,12 +112,3 @@ def load_train_val():
         val_set, batch_size=cfg.VAL_BATCH_SIZE, num_workers=cfg.N_WORKERS, shuffle=True)
 
     return train_loader, val_loader
-
-
-def load_test_dataset(data_folder, dataclass, make_dataframe_fun):
-    # Load the test dataframe
-    test_df = make_dataframe_fun(data_folder)
-
-    # Instantiate the dataset
-    test_data = dataclass(data_folder, test_df)
-    return test_data

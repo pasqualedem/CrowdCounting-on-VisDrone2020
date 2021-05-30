@@ -43,6 +43,7 @@ def prova():
 
 
 def test_net():
+    cfg_data.SIZE = (1080, 1920)
     res = evaluate_model(model_function=load_CC_test,
                          data_function=load_test,
                          bs=4,
@@ -53,6 +54,7 @@ def test_net():
 
 
 def train_net():
+    cfg_data.SIZE = (540, 960)
     trainer = Trainer(dataloader=load_train_val,
                       cfg_data=cfg_data,
                       net_fun=load_CC_train
@@ -67,4 +69,4 @@ if __name__ == '__main__':
         torch.manual_seed(seed)
         torch.cuda.manual_seed(seed)
 
-    train_net()
+    test_net()
