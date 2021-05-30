@@ -21,7 +21,7 @@ class Trainer:
         self.optimizer = optim.Adam(self.net.parameters(), lr=cfg.LR, weight_decay=1e-4)
         # self.optimizer = optim.SGD(self.net.parameters(), cfg.LR, momentum=0.95,weight_decay=5e-4)
         self.scheduler = StepLR(self.optimizer, step_size=cfg.NUM_EPOCH_LR_DECAY, gamma=cfg.LR_DECAY)
-        self.epoch = -1
+        self.epoch = 0
         self.score = np.nan
 
         if cfg.PRE_TRAINED:
@@ -142,6 +142,7 @@ class Trainer:
 
         mae = maes.avg
         rmse = np.sqrt(mses.avg)
+        self.score = rmse
         loss = losses.avg
 
         self.writer.add_scalar('val_loss', loss, self.epoch + 1)
@@ -166,4 +167,3 @@ class Trainer:
                       (time_sampe * 1000 / step),
                       self.timer['train time'].diff,
                       self.timer['val time'].diff)
-        self.score = rmse

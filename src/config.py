@@ -17,12 +17,12 @@ __C.PRE_TRAINED = 'exp/05-29_18-08_VisDrone_MobileCountx0_5_0.0001_1080x1920_LRD
 __C.EXP_PATH = './exp'
 __C.DATASET = 'VisDrone'
 __C.NET = 'MobileCountx0_75'
-__C.DETAILS = '_540x960'
+__C.DETAILS = '_1080x1920'
 
 # learning rate settings
 __C.LR = 1e-4  # learning rate
 __C.LR_DECAY = 0.995  # decay rate
-__C.LR_DECAY_START = -1  # when training epoch is more than it, the learning rate will be begin to decay
+__C.LR_DECAY_START = 0  # when training epoch is more than it, the learning rate will be begin to decay
 __C.NUM_EPOCH_LR_DECAY = 1  # decay frequency
 __C.MAX_EPOCH = 500
 

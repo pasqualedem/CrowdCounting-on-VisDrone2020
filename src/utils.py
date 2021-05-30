@@ -116,7 +116,7 @@ def logger_txt(log_file, epoch, scores):
 
 def print_summary(epoch, exp_name, scores, train_record, for_time, train_time, val_time):
     mae, mse, loss = scores
-    print('\n' + 'Epoch ' + str(epoch) + ' | ', end='')
+    print('Epoch ' + str(epoch) + ' | ', end='')
     print(str(exp_name) +
           '    [mae %.2f mse %.2f], [val loss %.4f] [forward time %.2f] [train/valid time %.2f / %.2f] --- '
           % (mae, mse, loss, for_time, train_time, val_time),
