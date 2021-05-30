@@ -9,7 +9,7 @@ import torch
 
 
 def load_CC_train():
-    cc = CrowdCounter([0], 'MobileCountx0_5')
+    cc = CrowdCounter([0], 'MobileCountx0_75')
     return cc
 
 
@@ -67,4 +67,4 @@ if __name__ == '__main__':
         torch.manual_seed(seed)
         torch.cuda.manual_seed(seed)
 
-    test_net()
+    train_net()

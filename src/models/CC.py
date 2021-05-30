@@ -4,6 +4,7 @@ from models.MobileCount import MobileCount
 
 MBVersions = {
     'MobileCountx0_5': [16, 32, 64, 128],
+    'MobileCountx0_75': [32, 48, 80, 160],
     'MobileCount': [32, 64, 128, 256],
     'MobileCountx1_25': [64, 96, 160, 320],
     'MobileCountx2': [64, 128, 256, 512],
