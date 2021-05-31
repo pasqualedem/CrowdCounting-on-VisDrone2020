@@ -117,14 +117,15 @@ def load_train_val():
 
     @return: the train and validation DataLoader
     """
-    df = make_dataframe('../dataset/VisDrone2020-CC/sequences')
+    train_df = make_dataframe('../dataset/VisDrone2020-CC/train')
+    valid_df = make_dataframe('../dataset/VisDrone2020-CC/val')
 
     # Split the dataframe in train and validation
-    train_df, valid_df = sklearn.model_selection.train_test_split(
-        df, test_size=cfg.VAL_SIZE, shuffle=True
-    )
-    train_df = train_df.reset_index(drop=True)
-    valid_df = valid_df.reset_index(drop=True)
+    #train_df, valid_df = sklearn.model_selection.train_test_split(
+    #    df, test_size=cfg.VAL_SIZE, shuffle=True
+    #)
+    #train_df = train_df.reset_index(drop=True)
+    #valid_df = valid_df.reset_index(drop=True)
 
     train_set = VisDroneDataset(train_df)
     train_loader = torch.utils.data.DataLoader(
@@ -135,3 +136,17 @@ def load_train_val():
         val_set, batch_size=cfg.VAL_BATCH_SIZE, num_workers=cfg.N_WORKERS, shuffle=True)
 
     return train_loader, val_loader
+
+
+def generate_validation():
+    import os
+    import numpy as np
+    import shutil
+    np.random.seed(cfg.SEED)
+    source = "../../dataset/VisDrone2020-CC/sequences"
+    target = "../val"
+    os.chdir(source)
+    l = os.listdir()
+    val = np.random.choice(l, 16, replace=False)  # 16 is the 0.20 of the training set
+    for file in val:
+        shutil.move(os.path.join('./', file), os.path.join(target, file))
