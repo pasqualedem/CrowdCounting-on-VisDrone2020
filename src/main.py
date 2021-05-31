@@ -48,7 +48,7 @@ def test_net():
                          bs=4,
                          n_workers=2,
                          losses={'rmse': lambda x, y: mean_squared_error(x, y, squared=False), 'mae': mean_absolute_error},
-                         out_prediction=cfg.PRE_TRAINED
+                         out_prediction=None
                          )
     print(res)
 
@@ -68,4 +68,4 @@ if __name__ == '__main__':
         torch.manual_seed(seed)
         torch.cuda.manual_seed(seed)
 
-    train_net()
+    test_net()
