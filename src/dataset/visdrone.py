@@ -13,7 +13,7 @@ import transformations as trans
 
 cfg_data = EasyDict()
 
-cfg_data.SIZE = (540, 960)
+cfg_data.SIZE = (1080, 1920)
 cfg_data.CROP_SIZE = (540, 960)
 cfg_data.FILE_EXTENSION = '.jpg'
 cfg_data.GT_FILE_EXTENSION = '.h5'
@@ -143,7 +143,7 @@ def generate_validation():
     import numpy as np
     import shutil
     np.random.seed(cfg.SEED)
-    source = "../../dataset/VisDrone2020-CC/sequences"
+    source = "../../dataset/VisDrone2020-CC/train"
     target = "../val"
     os.chdir(source)
     l = os.listdir()

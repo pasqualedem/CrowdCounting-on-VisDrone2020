@@ -9,12 +9,12 @@ import torch
 
 
 def load_CC_train():
-    cc = CrowdCounter([0], 'MobileCountx0_75')
+    cc = CrowdCounter([0], cfg.NET)
     return cc
 
 
 def load_CC_test():
-    cc = CrowdCounter([0], 'MobileCountx0_75')
+    cc = CrowdCounter([0], cfg.NET)
     if cfg.PRE_TRAINED:
         cc.load(cfg.PRE_TRAINED)
     return cc
@@ -48,6 +48,7 @@ def test_net():
                          bs=4,
                          n_workers=2,
                          losses={'rmse': lambda x, y: mean_squared_error(x, y, squared=False), 'mae': mean_absolute_error},
+                         out_prediction=cfg.PRE_TRAINED
                          )
     print(res)
 
