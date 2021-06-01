@@ -11,13 +11,13 @@ __C.TRAIN_BATCH_SIZE = 2
 __C.VAL_BATCH_SIZE = 6
 __C.N_WORKERS = 4
 
-__C.PRE_TRAINED = 'exp/05-31_10-53_VisDrone_MobileCount_0.0001_1080x1920_NVS/all_ep_23_mae_29.5_rmse_38.3.pth'
+__C.PRE_TRAINED = None
 
 # path settings
 __C.EXP_PATH = './exp'
 __C.DATASET = 'VisDrone'
-__C.NET = 'MobileCountx0_75'
-__C.DETAILS = '_1080x1920_NVS'
+__C.NET = 'MobileCount'
+__C.DETAILS = '_1080x1920_SGD'
 
 # learning optimizer settings
 __C.LR = 1e-4  # learning rate
@@ -39,7 +39,7 @@ __C.OPTIM_SGD = ('SGD',
                       'momentum': 0.95
                   })
 
-__C.OPTIM = __C.OPTIM_ADAM  # Chosen optimizer
+__C.OPTIM = __C.OPTIM_SGD  # Chosen optimizer
 
 __C.PATIENCE = 15
 __C.EARLY_STOP_DELTA = 1e-2
