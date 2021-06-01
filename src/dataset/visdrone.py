@@ -117,15 +117,16 @@ def load_train_val():
 
     @return: the train and validation DataLoader
     """
-    train_df = make_dataframe('../dataset/VisDrone2020-CC/train')
-    valid_df = make_dataframe('../dataset/VisDrone2020-CC/val')
+    #train_df = make_dataframe('../dataset/VisDrone2020-CC/train')
+    #valid_df = make_dataframe('../dataset/VisDrone2020-CC/val')
 
+    df = make_dataframe('../dataset/VisDrone2020-CC/train')
     # Split the dataframe in train and validation
-    #train_df, valid_df = sklearn.model_selection.train_test_split(
-    #    df, test_size=cfg.VAL_SIZE, shuffle=True
-    #)
-    #train_df = train_df.reset_index(drop=True)
-    #valid_df = valid_df.reset_index(drop=True)
+    train_df, valid_df = sklearn.model_selection.train_test_split(
+        df, test_size=cfg.VAL_SIZE, shuffle=True
+    )
+    train_df = train_df.reset_index(drop=True)
+    valid_df = valid_df.reset_index(drop=True)
 
     train_set = VisDroneDataset(train_df)
     train_loader = torch.utils.data.DataLoader(
