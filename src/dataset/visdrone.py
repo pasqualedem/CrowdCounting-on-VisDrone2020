@@ -19,6 +19,10 @@ cfg_data.FILE_EXTENSION = '.jpg'
 cfg_data.GT_FILE_EXTENSION = '.h5'
 cfg_data.LOG_PARA = 2550.0
 
+cfg_data.GAMMA_CORRECTION = True
+cfg_data.BETA_ALPHA = 4.2
+cfg_data.BETA_BETA = 2.4
+
 cfg_data.MEAN = [0.43476477, 0.44504763, 0.43252817]
 cfg_data.STD = [0.20490805, 0.19712372, 0.20312176]
 
@@ -34,11 +38,15 @@ class VisDroneDataset(torch.utils.data.Dataset):
 
         if img_transform:
             # Initialize data transforms
-            self.img_transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
-                                                                 torchvision.transforms.Normalize(mean=cfg_data.MEAN,
-                                                                                                  std=cfg_data.STD),
-                                                                 torchvision.transforms.Resize(cfg_data.SIZE)
-                                                                 ])  # normalize to (-1, 1)
+            trans_list = [torchvision.transforms.ToTensor(),
+                          torchvision.transforms.Normalize(mean=cfg_data.MEAN,
+                                                           std=cfg_data.STD),
+                          torchvision.transforms.Resize(cfg_data.SIZE)
+                          ]
+            if cfg_data.GAMMA_CORRECTION:
+                trans_list.append(trans.RandomGammaCorrection(cfg_data.BETA_ALPHA, cfg_data.BETA_BETA))
+            self.img_transform = torchvision.transforms.Compose(trans_list)  # normalize to (-1, 1)
+
         if gt_transform:
             self.gt_transform = torchvision.transforms.Compose([
                 trans.Scale(cfg_data.LOG_PARA)
@@ -117,8 +125,8 @@ def load_train_val():
 
     @return: the train and validation DataLoader
     """
-    #train_df = make_dataframe('../dataset/VisDrone2020-CC/train')
-    #valid_df = make_dataframe('../dataset/VisDrone2020-CC/val')
+    # train_df = make_dataframe('../dataset/VisDrone2020-CC/train')
+    # valid_df = make_dataframe('../dataset/VisDrone2020-CC/val')
 
     df = make_dataframe('../dataset/VisDrone2020-CC/train')
     # Split the dataframe in train and validation

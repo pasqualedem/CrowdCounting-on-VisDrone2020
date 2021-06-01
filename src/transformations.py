@@ -52,6 +52,16 @@ class RandomCrop(object):
         return img.crop((x1, y1, x1 + tw, y1 + th)), mask.crop((x1, y1, x1 + tw, y1 + th))
 
 
+class RandomGammaCorrection(object):
+    def __init__(self, alpha, beta):
+        self.alpha = alpha
+        self.beta = beta
+
+    def __call__(self, img):
+        gamma = np.random.beta(self.alpha, self.beta)
+        return np.power(img, 1/gamma)
+
+
 class Scale(object):
     def __init__(self, factor):
         self.factor = factor
