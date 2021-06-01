@@ -15,7 +15,7 @@ __C.N_WORKERS = 2
 __C.PRE_TRAINED = 'exp/05-31_15-45_VisDrone_MobileCountx0_75_0.0001__540x960_NVS/all_ep_14_mae_36.7_rmse_50.6.pth'
 
 # path settings
-__C.EXP_PATH = './exp'
+__C.EXP_PATH = '../exp'
 __C.DATASET = 'VisDrone'
 __C.NET = 'MobileCountx0_75'
 __C.DETAILS = '_1080x1920_SGD'
