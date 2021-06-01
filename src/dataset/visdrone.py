@@ -13,14 +13,14 @@ import transformations as trans
 
 cfg_data = EasyDict()
 
-cfg_data.SIZE = (540, 960)
+cfg_data.SIZE = (1080, 1920)
 cfg_data.CROP_SIZE = (540, 960)
 cfg_data.FILE_EXTENSION = '.jpg'
 cfg_data.GT_FILE_EXTENSION = '.h5'
 cfg_data.LOG_PARA = 2550.0
 
-MEAN = [0.43476477, 0.44504763, 0.43252817]
-STD = [0.20490805, 0.19712372, 0.20312176]
+cfg_data.MEAN = [0.43476477, 0.44504763, 0.43252817]
+cfg_data.STD = [0.20490805, 0.19712372, 0.20312176]
 
 
 class VisDroneDataset(torch.utils.data.Dataset):
@@ -35,8 +35,8 @@ class VisDroneDataset(torch.utils.data.Dataset):
         if img_transform:
             # Initialize data transforms
             self.img_transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
-                                                                 torchvision.transforms.Normalize(mean=MEAN,
-                                                                                                  std=STD),
+                                                                 torchvision.transforms.Normalize(mean=cfg_data.MEAN,
+                                                                                                  std=cfg_data.STD),
                                                                  torchvision.transforms.Resize(cfg_data.SIZE)
                                                                  ])  # normalize to (-1, 1)
         if gt_transform:

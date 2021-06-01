@@ -9,7 +9,8 @@ __C.SEED = 3035  # random seed
 # System settings
 __C.TRAIN_BATCH_SIZE = 2
 __C.VAL_BATCH_SIZE = 6
-__C.N_WORKERS = 4
+__C.TEST_BATCH_SIZE = 2
+__C.N_WORKERS = 2
 
 __C.PRE_TRAINED = 'exp/05-31_15-45_VisDrone_MobileCountx0_75_0.0001__540x960_NVS/all_ep_14_mae_36.7_rmse_50.6.pth'
 
