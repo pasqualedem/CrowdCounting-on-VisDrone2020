@@ -1,6 +1,6 @@
 import argparse
-import os
 
+from ast import literal_eval
 import matplotlib.pyplot as plt
 from evaluate import evaluate_model
 from sklearn.metrics import mean_squared_error, mean_absolute_error
@@ -59,12 +59,8 @@ def test_net():
     print(res)
 
 
-def run_net(in_file):
-    folder = '../dataset/VisDrone2020-CC/val/00001'
-    img = '../dataset/VisDrone2020-CC/test/00070/00001.jpg'
-    files = [os.path.join(folder, f) for f in
-             list(filter(lambda x: '.jpg' in x, os.listdir(folder)))]
-    dataset = make_dataset(img)
+def run_net(in_file, callbacks):
+    dataset = make_dataset(in_file)
 
     transforms = run_transforms(cfg_data.MEAN, cfg_data.STD, cfg_data.SIZE)
     dataset.set_transforms(transforms)
@@ -75,7 +71,11 @@ def run_net(in_file):
     def save_callback(input, prediction, other):
         plt.imsave(other + '.png', prediction.squeeze(), cmap='jet')
 
-    run_model(load_CC_test, dataset, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, save_callback)
+    call_dict = {'save_callback': save_callback, 'count_callback': count_callback}
+
+    callbacks = [(call_dict[call] if type(call) == 'str' else call) for call in callbacks]
+
+    run_model(load_CC_test, dataset, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, callbacks)
 
 
 def train_net():
@@ -96,11 +96,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Execute a training, an evaluation or run the net on some example')
     parser.add_argument('mode', type=str, help='can be train, test or run')
     parser.add_argument('--in_file', type=str, help='in run mode, the input file or folder to be processed')
+    parser.add_argument('--callbacks', type=str,
+                        help='List of callbacks, they can be [\'save_callback\', \'count_callback\']')
     args = parser.parse_args()
 
+    callbacks = literal_eval(args.callbacks)
     if args.mode == 'train':
         train_net()
     elif args.mode == 'test':
         test_net()
     elif args.mode == 'run':
-        run_net(args.in_file)
+        run_net(args.in_file, callbacks)

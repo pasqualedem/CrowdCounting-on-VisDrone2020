@@ -2,7 +2,7 @@ import torch
 import torchvision
 
 
-def run_model(model_fun, dataset, batch_size, n_workers, callback):
+def run_model(model_fun, dataset, batch_size, n_workers, callbacks):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Running using device: ' + str(device))
 
@@ -23,7 +23,8 @@ def run_model(model_fun, dataset, batch_size, n_workers, callback):
             input = input.to('cpu')
             predictions = predictions.to('cpu')
             for i in range(input.shape[0]):
-                callback(input[i], predictions[i], other[i])
+                for callback in callbacks:
+                    callback(input[i], predictions[i], other[i])
 
 
 def run_transforms(mean, std, size):
