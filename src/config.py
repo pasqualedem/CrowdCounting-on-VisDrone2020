@@ -7,18 +7,18 @@ cfg = __C
 __C.SEED = 3035  # random seed
 
 # System settings
-__C.TRAIN_BATCH_SIZE = 2
+__C.TRAIN_BATCH_SIZE = 4
 __C.VAL_BATCH_SIZE = 6
 __C.TEST_BATCH_SIZE = 6
 __C.N_WORKERS = 2
 
-__C.PRE_TRAINED = None
+__C.PRE_TRAINED = '../exp/06-02_20-15_VisDrone_MobileCountx0_5_0.0001__540x960_GC/all_ep_43_mae_16.4_rmse_21.3.pth'
 
 # path settings
 __C.EXP_PATH = '../exp'
 __C.DATASET = 'VisDrone'
-__C.NET = 'MobileCountx0_75'
-__C.DETAILS = '_1080x1920_GC'
+__C.NET = 'MobileCountx0_5'
+__C.DETAILS = '_1080x1920_NVS'
 
 # learning optimizer settings
 __C.LR = 1e-4  # learning rate
