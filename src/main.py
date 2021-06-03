@@ -100,7 +100,10 @@ if __name__ == '__main__':
                         help='List of callbacks, they can be [\'save_callback\', \'count_callback\']')
     args = parser.parse_args()
 
-    callbacks = literal_eval(args.callbacks)
+    if args.callbacks is not None:
+        callbacks = literal_eval(args.callbacks)
+    else:
+        callbacks = []
     if args.mode == 'train':
         train_net()
     elif args.mode == 'test':

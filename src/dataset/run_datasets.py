@@ -27,7 +27,7 @@ class FilesDataset(torch.utils.data.Dataset):
 
 class FolderDataset(FilesDataset):
     def __init__(self, folder, transforms=None):
-        files = [os.path.join(folder, self.files[file]) for file in os.listdir(folder)]
+        files = [os.path.join(folder, file) for file in os.listdir(folder)]
         super().__init__(files, transforms)
 
 

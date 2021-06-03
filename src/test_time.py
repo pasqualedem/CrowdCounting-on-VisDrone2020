@@ -26,6 +26,7 @@ def load_CC(MC):
 
 
 def load_CC05(): return load_CC('MobileCountx0_5')
+def load_CC075(): return load_CC('MobileCountx0_75')
 def load_CC1(): return load_CC('MobileCount')
 def load_CC125(): return load_CC('MobileCountx1_25')
 def load_CC2(): return load_CC('MobileCountx2')
@@ -35,6 +36,7 @@ models = {'vgg16': vgg16,
           'vgg19': vgg19,
           'vgg11': vgg11,
           'CC05': load_CC05,
+          'CC075': load_CC075,
           'CC1': load_CC1,
           'CC125': load_CC125,
           'CC2': load_CC2
