@@ -263,8 +263,8 @@ if __name__ == '__main__':
     print('Model is loaded, start forwarding.')
     benchmarker = Benchmarker(model, dataset, bs, args.file, args.n_workers)
     if args.mode == 'forward':
-        benchmarker.bench_forward(args.num_warmup_runs, args.num_runs)
+        benchmarker.bench_forward(args.num_runs, args.num_warmup_runs)
     elif args.mode == 'fps':
-        benchmarker.bench_fps(args.num_warmup_runs, args.num_runs)
+        benchmarker.bench_fps(args.num_runs, args.num_warmup_runs)
     else:
         print('Wrong mode given: ' + str(args.mode))
