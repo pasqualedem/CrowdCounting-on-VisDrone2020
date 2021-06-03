@@ -18,7 +18,7 @@ cfg_data.FILE_EXTENSION = '.jpg'
 cfg_data.GT_FILE_EXTENSION = '.h5'
 cfg_data.LOG_PARA = 2550.0
 
-cfg_data.GAMMA_CORRECTION = False
+cfg_data.GAMMA_CORRECTION = True
 cfg_data.BETA_ALPHA = 4.2
 cfg_data.BETA_BETA = 2.4
 
@@ -124,16 +124,16 @@ def load_train_val():
 
     @return: the train and validation DataLoader
     """
-    train_df = make_dataframe('../dataset/VisDrone2020-CC/train')
-    valid_df = make_dataframe('../dataset/VisDrone2020-CC/val')
+    # train_df = make_dataframe('../dataset/VisDrone2020-CC/train')
+    # valid_df = make_dataframe('../dataset/VisDrone2020-CC/val')
 
-    # df = make_dataframe('../dataset/VisDrone2020-CC/train')
-    # # Split the dataframe in train and validation
-    # train_df, valid_df = sklearn.model_selection.train_test_split(
-    #     df, test_size=cfg.VAL_SIZE, shuffle=True
-    # )
-    # train_df = train_df.reset_index(drop=True)
-    # valid_df = valid_df.reset_index(drop=True)
+    df = make_dataframe('../dataset/VisDrone2020-CC/train')
+    # Split the dataframe in train and validation
+    train_df, valid_df = sklearn.model_selection.train_test_split(
+        df, test_size=cfg.VAL_SIZE, shuffle=True
+    )
+    train_df = train_df.reset_index(drop=True)
+    valid_df = valid_df.reset_index(drop=True)
 
     train_set = VisDroneDataset(train_df)
     train_loader = torch.utils.data.DataLoader(
