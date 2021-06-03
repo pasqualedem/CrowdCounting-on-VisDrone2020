@@ -1,6 +1,7 @@
 import argparse
 import os
 
+import matplotlib.pyplot as plt
 from evaluate import evaluate_model
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from models.CC import CrowdCounter
@@ -60,17 +61,21 @@ def test_net():
 
 def run_net(in_file):
     folder = '../dataset/VisDrone2020-CC/val/00001'
+    img = '../dataset/VisDrone2020-CC/test/00070/00001.jpg'
     files = [os.path.join(folder, f) for f in
              list(filter(lambda x: '.jpg' in x, os.listdir(folder)))]
-    dataset = make_dataset(files)
+    dataset = make_dataset(img)
 
     transforms = run_transforms(cfg_data.MEAN, cfg_data.STD, cfg_data.SIZE)
     dataset.set_transforms(transforms)
 
-    def callback(input, prediction, other):
+    def count_callback(input, prediction, other):
         print(other + ' Count: ' + str(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA))
 
-    run_model(load_CC_test, dataset, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, callback)
+    def save_callback(input, prediction, other):
+        plt.imsave(other + '.png', prediction.squeeze(), cmap='jet')
+
+    run_model(load_CC_test, dataset, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, save_callback)
 
 
 def train_net():
