@@ -50,7 +50,7 @@ class VideoDataset(torch.utils.data.Dataset):
         if self.transforms:
             data = self.transforms(data)
         self.frame_count += 1
-        return data, self.frame_count - 1
+        return data, str(self.frame_count - 1)
 
 
 def make_dataset(input):

@@ -87,7 +87,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Execute a training, an evaluation or run the net on some example')
     parser.add_argument('mode', type=str, help='can be train, test or run')
-    parser.add_argument('--in_file', type=str, help='in run mode, the input file or folder to be processed')
+    parser.add_argument('--path', type=str, help='in run mode, the input file or folder to be processed')
     parser.add_argument('--callbacks', type=str,
                         help='List of callbacks, they can be [\'save_callback\', \'count_callback\']')
     args = parser.parse_args()
@@ -101,4 +101,4 @@ if __name__ == '__main__':
     elif args.mode == 'test':
         test_net()
     elif args.mode == 'run':
-        run_net(args.in_file, callbacks)
+        run_net(args.path, callbacks)
