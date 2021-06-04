@@ -46,6 +46,7 @@ class VideoDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, item):
         ret, data = self.video.read()
+        data = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
 
         if self.transforms:
             data = self.transforms(data)
