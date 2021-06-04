@@ -1,8 +1,10 @@
 from PIL import Image
 import matplotlib.pyplot as plt
 import torch
+import cv2
 import numpy as np
 from dataset.visdrone import cfg_data
+from transformations import DeNormalize
 
 
 def display_callback(input, prediction, name):
@@ -26,4 +28,21 @@ def save_callback(input, prediction, name):
     plt.imsave(name + '.png', prediction.squeeze(), cmap='jet')
 
 
-call_dict = {'save_callback': save_callback, 'count_callback': count_callback, 'display_callback': display_callback}
+def video_callback(input, prediction, name):
+    restore = DeNormalize(cfg_data.MEAN, cfg_data.STD)
+    GT_SCALE_FACTOR = 2550
+    count = str(np.round(torch.sum(prediction).item() / GT_SCALE_FACTOR))
+    cm = plt.get_cmap('jet')
+    prediction = cm(prediction.squeeze().cpu()).astype(dtype='float32')
+    prediction = cv2.cvtColor(prediction, cv2.COLOR_RGBA2BGR)
+    input = restore(input).permute(1, 2, 0)
+    frame = np.hstack((input, prediction))
+    cv2.imshow('Count: ' + str(count), frame)
+    if cv2.waitKey(20) & 0xFF == ord('q'):
+        pass
+
+
+call_dict = {'save_callback': save_callback,
+             'count_callback': count_callback,
+             'display_callback': display_callback,
+             'video_callback': video_callback}
