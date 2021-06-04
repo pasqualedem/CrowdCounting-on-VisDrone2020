@@ -12,6 +12,17 @@ def test_model(
         device=None,
         out_prediction=None
 ):
+    """
+    Test the given model on a given dataset
+
+    @param model: torch model to test
+    @param data_test: torch dataset for testing the madel
+    @param batch_size: batch size for parallel computation
+    @param n_workers: n° workers for parallel processing
+    @param device: device where to compute the network calculations (cuda or cpu)
+    @param out_prediction: boolean that specify if saving the heatmaps generated
+    @return: y_true and y_pres
+    """
     # Get the device to use
     if device is None:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -53,6 +64,18 @@ def test_model(
 
 
 def evaluate_model(model_function, data_function, bs, n_workers, losses, device=None, out_prediction=None):
+    """
+    Evaluate a given model on a given dataset using the given loss functions
+
+    @param model_function: function that returns the torch model
+    @param data_function: function that return the torch dataset
+    @param bs: batch size for parallel computation
+    @param n_workers: n° workers for parallel processing
+    @param losses: list of loss functions
+    @param device: device where to compute the network calculations (cuda or cpu)
+    @param out_prediction: boolean that specify if saving the heatmaps generated
+    @return: list of loss values
+    """
     ds = data_function()
     net = model_function()
     net = net.to(device)

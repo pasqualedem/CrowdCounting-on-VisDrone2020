@@ -27,7 +27,17 @@ cfg_data.STD = [0.20490805, 0.19712372, 0.20312176]
 
 
 class VisDroneDataset(torch.utils.data.Dataset):
+    """
+    Dataset subclass for the VisDrone dataset
+    """
     def __init__(self, dataframe, train=True, img_transform=True, gt_transform=True):
+        """
+        Initialize VisDroneDataset object
+        @param dataframe: dataframe of columns [id, filename, gt_filename] for loading images and ground truth
+        @param train: boolean that specify if dataset is loaded for train (it applies the Random Horizontal Flip)
+        @param img_transform: boolean that specify if scaling, normalizing and resizing data
+        @param gt_transform: boolean that specify if multiply the GT to the LOG_PARA constant
+        """
         self.dataframe = dataframe
         self.train_transforms = None
         self.img_transform = None

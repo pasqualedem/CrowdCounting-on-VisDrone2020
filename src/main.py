@@ -15,39 +15,29 @@ import torch
 
 
 def load_CC_train():
+    """
+    Load CrowdCounter model net for training mode
+    """
     cc = CrowdCounter([0], cfg.NET)
     return cc
 
 
 def load_CC_test():
+
+    """
+    Load CrowdCounter model net for testing mode
+    """
     cc = CrowdCounter([0], cfg.NET)
     if cfg.PRE_TRAINED:
         cc.load(cfg.PRE_TRAINED)
     return cc
 
 
-class ProvaSet(torch.utils.data.Dataset):
-
-    def __getitem__(self, item):
-        return torch.rand(3, 50, 50), torch.rand(50, 50)
-
-    def __len__(self):
-        return 50
-
-
-def prova():
-    train_set = ProvaSet()
-    train_loader = torch.utils.data.DataLoader(
-        train_set, batch_size=cfg.TRAIN_BATCH_SIZE, num_workers=cfg.N_WORKERS, shuffle=True)
-
-    val_set = ProvaSet()
-    val_loader = torch.utils.data.DataLoader(
-        val_set, batch_size=cfg.VAL_BATCH_SIZE, num_workers=cfg.N_WORKERS, shuffle=True)
-
-    return train_loader, val_loader
-
-
 def test_net():
+    """
+    Test a model on a specific test set
+    Must specify the function tha returns the model and the dataset
+    """
     res = evaluate_model(model_function=load_CC_test,
                          data_function=load_test,
                          bs=cfg.TEST_BATCH_SIZE,
@@ -60,6 +50,12 @@ def test_net():
 
 
 def run_net(in_file, callbacks):
+    """
+    Run the model on a given file or folder
+
+    @param in_file: media file or folder of images
+    @param callbacks: list of callbacks to be called after every forward operation
+    """
     dataset = make_dataset(in_file)
 
     transforms = run_transforms(cfg_data.MEAN, cfg_data.STD, cfg_data.SIZE)
@@ -71,6 +67,9 @@ def run_net(in_file, callbacks):
 
 
 def train_net():
+    """
+    Train the given model on a given data loader
+    """
     trainer = Trainer(dataloader=load_train_val,
                       cfg_data=cfg_data,
                       net_fun=load_CC_train

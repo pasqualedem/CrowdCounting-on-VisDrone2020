@@ -12,6 +12,9 @@ MBVersions = {
 
 
 class CrowdCounter(nn.Module):
+    """
+    Container class for MobileCount networks
+    """
     def __init__(self, gpus, model_name):
         super(CrowdCounter, self).__init__()
 

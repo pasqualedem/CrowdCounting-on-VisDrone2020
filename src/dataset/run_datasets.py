@@ -7,6 +7,9 @@ import cv2
 
 
 class FilesDataset(torch.utils.data.Dataset):
+    """
+    Dataset torch subclass to load a list of images
+    """
     def __init__(self, files, transforms=None):
         self.files = files
         self.transforms = transforms
@@ -26,12 +29,18 @@ class FilesDataset(torch.utils.data.Dataset):
 
 
 class FolderDataset(FilesDataset):
+    """
+    Dataset torch subclass to load a folder of images
+    """
     def __init__(self, folder, transforms=None):
         files = [os.path.join(folder, file) for file in os.listdir(folder)]
         super().__init__(files, transforms)
 
 
 class VideoDataset(torch.utils.data.Dataset):
+    """
+    Dataset torch subclass to encapsulate a video
+    """
     def __init__(self, video_file, transforms=None):
         self.video = cv2.VideoCapture(video_file)
         self.length = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -55,6 +64,12 @@ class VideoDataset(torch.utils.data.Dataset):
 
 
 def make_dataset(input):
+    """
+    Choose the right Dataset object w.r.t. the input type
+    @param input: Can be the filename of an image or video,
+    the folder containing the images or a list of image filenames
+    @return:
+    """
     if issubclass(type(input), str):
         if os.path.isdir(input):
             return FolderDataset(input)

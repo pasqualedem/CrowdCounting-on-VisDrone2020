@@ -13,6 +13,14 @@ FILENAME_LEN = 5
 
 
 def generate_heatmap(df, img_size, wished_heatmap_size):
+    """
+    Generate a dictionary of heatmaps
+
+    @param df: dataframe of columns [frame, x, y]
+    @param img_size: original size of the image
+    @param wished_heatmap_size: parameter for resizing the heatmap
+    @return:
+    """
     heatmaps = {}
     frames = np.unique(df['frame'].values)
     img_size = np.array(img_size)
@@ -64,8 +72,13 @@ def make_ground_truth(folder, img_folder, name_rule, img_rule, dataframe_fun, si
 
 
 def dataframe_load_test(filename):
+    """
+    Load the dataframe for the test set csv format of VisDrone
+    @param filename: csv path
+    @return: dataframe of columns [frame, x, y]
+    """
     df = pd.read_csv(filename, header=None)
-    df.columns = ['frame', 'head_id', 'x', 'y', 'width', 'height', 'out', 'occl', 'mistero', 'boh']
+    df.columns = ['frame', 'head_id', 'x', 'y', 'width', 'height', 'out', 'occl', 'undefinied', 'undefinied']
     df['x'] = df['x'] + df['width'] // 2
     df['y'] = df['y'] + df['height'] // 2
 
@@ -75,6 +88,11 @@ def dataframe_load_test(filename):
 
 
 def dataframe_load_train(filename):
+    """
+    Load the dataframe for the training set csv format of VisDrone
+    @param filename: csv path
+    @return: dataframe of columns [frame, x, y]
+    """
     df = pd.read_csv(filename, header=None)
     df.columns = ['frame', 'x', 'y']
     return df

@@ -4,8 +4,11 @@ from dataset.visdrone import VisDroneDataset, make_dataframe
 
 
 def calculate():
+    """
+    Calculate the mean and the standard deviation of a dataset
+    """
     df = make_dataframe('../dataset/VisDrone2020-CC/sequences')
-    ds = VisDroneDataset(df, transform=False)
+    ds = VisDroneDataset(df, train=False)
     length = len(ds)
     means = 0
     stds = 0

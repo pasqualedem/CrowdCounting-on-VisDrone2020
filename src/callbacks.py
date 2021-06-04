@@ -8,6 +8,9 @@ from transformations import DeNormalize
 
 
 def display_callback(input, prediction, name):
+    """
+    displays using matplotlib the input image and the prediction
+    """
     GT_SCALE_FACTOR = 2550
     img = Image.open(name)
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(30, 8))
@@ -21,14 +24,23 @@ def display_callback(input, prediction, name):
 
 
 def count_callback(input, prediction, name):
+    """
+    prints the counting predicted
+    """
     print(str(name) + ' Count: ' + str(np.round(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA)))
 
 
 def save_callback(input, prediction, name):
+    """
+    serialize the prediciton image adding .png to the original file name
+    """
     plt.imsave(name + '.png', prediction.squeeze(), cmap='jet')
 
 
 def video_callback(input, prediction, name):
+    """
+    show image input and prediction into a cv2 window
+    """
     restore = DeNormalize(cfg_data.MEAN, cfg_data.STD)
     GT_SCALE_FACTOR = 2550
     count = str(np.round(torch.sum(prediction).item() / GT_SCALE_FACTOR))

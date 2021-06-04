@@ -16,6 +16,9 @@ FILE_EXTENSION = '.jpg'
 
 
 class PeopleFlowsDataset(torch.utils.data.Dataset):
+    """
+    Torch dataset subclass for loading the PeopleFlows dataset
+    """
     def __init__(self, path, dataframe):
         self.path = path
 
