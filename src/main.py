@@ -73,7 +73,7 @@ def run_net(in_file, callbacks):
 
     call_dict = {'save_callback': save_callback, 'count_callback': count_callback}
 
-    callbacks = [(call_dict[call] if type(call) == 'str' else call) for call in callbacks]
+    callbacks = [(call_dict[call] if type(call) == str else call) for call in callbacks]
 
     run_model(load_CC_test, dataset, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, callbacks)
 

@@ -32,10 +32,14 @@ class FolderDataset(FilesDataset):
 
 
 class VideoDataset(torch.utils.data.Dataset):
-    def __init__(self, video_file):
+    def __init__(self, video_file, transforms):
         self.video = cv2.VideoCapture(video_file)
         self.length = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
         self.frame_count = 0
+        self.transforms = transforms
+
+    def set_transforms(self, transforms):
+        self.transforms = transforms
 
     def __len__(self):
         return self.length
