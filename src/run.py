@@ -27,7 +27,7 @@ def run_model(model_fun, dataset, batch_size, n_workers, callbacks):
             predictions = predictions.to('cpu')
             for i in range(input.shape[0]):
                 for callback in callbacks:
-                    callback(input[i], predictions[i], other[i])
+                    callback(input[i], predictions[i], other[i].item())
 
 
 def run_transforms(mean, std, size):

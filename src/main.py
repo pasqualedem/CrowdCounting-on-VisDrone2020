@@ -1,7 +1,7 @@
 import argparse
 
 from ast import literal_eval
-import matplotlib.pyplot as plt
+from callbacks import call_dict
 from evaluate import evaluate_model
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from models.CC import CrowdCounter
@@ -65,17 +65,9 @@ def run_net(in_file, callbacks):
     transforms = run_transforms(cfg_data.MEAN, cfg_data.STD, cfg_data.SIZE)
     dataset.set_transforms(transforms)
 
-    def count_callback(input, prediction, name):
-        print(str(name) + ' Count: ' + str(np.round(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA)))
+    callbacks_list = [(call_dict[call] if type(call) == str else call) for call in callbacks]
 
-    def save_callback(input, prediction, other):
-        plt.imsave(other + '.png', prediction.squeeze(), cmap='jet')
-
-    call_dict = {'save_callback': save_callback, 'count_callback': count_callback}
-
-    callbacks = [(call_dict[call] if type(call) == str else call) for call in callbacks]
-
-    run_model(load_CC_test, dataset, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, callbacks)
+    run_model(load_CC_test, dataset, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, callbacks_list)
 
 
 def train_net():
