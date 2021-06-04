@@ -1,5 +1,6 @@
 import torch
 import torchvision
+from dataset.run_datasets import VideoDataset
 
 
 def run_model(model_fun, dataset, batch_size, n_workers, callbacks):
@@ -8,6 +9,8 @@ def run_model(model_fun, dataset, batch_size, n_workers, callbacks):
 
     model = model_fun()
     # Setup the data loader
+    if type(dataset) == VideoDataset:
+        n_workers = 0
     data_loader = torch.utils.data.DataLoader(
         dataset, batch_size=batch_size, shuffle=False, num_workers=n_workers
     )

@@ -65,8 +65,8 @@ def run_net(in_file, callbacks):
     transforms = run_transforms(cfg_data.MEAN, cfg_data.STD, cfg_data.SIZE)
     dataset.set_transforms(transforms)
 
-    def count_callback(input, prediction, other):
-        print(other + ' Count: ' + str(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA))
+    def count_callback(input, prediction, name):
+        print(str(name) + ' Count: ' + str(np.round(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA)))
 
     def save_callback(input, prediction, other):
         plt.imsave(other + '.png', prediction.squeeze(), cmap='jet')
