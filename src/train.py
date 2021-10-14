@@ -5,6 +5,7 @@ from config import cfg
 from utils import *
 import time
 from tqdm import tqdm
+import mlflow
 
 
 optimizers = {
@@ -56,6 +57,10 @@ class Trainer:
         """
         Train the model on the dataset using the parameters of the config file.
         """
+        mlflow.start_run()
+
+        mlflow.log_params(cfg)
+        mlflow.log_params(self.cfg_data)
         print("Experiment: " + self.exp_name)
         early_stop = EarlyStopping(patience=cfg.PATIENCE, delta=cfg.EARLY_STOP_DELTA)
         for epoch in range(self.epoch, cfg.MAX_EPOCH):
@@ -74,7 +79,9 @@ class Trainer:
 
             if early_stop(self.score):
                 print('Early stopped! At epoch ' + str(self.epoch))
+                mlflow.end_run()
                 break
+        mlflow.end_run()
 
     def forward_dataset(self):
         """
@@ -192,3 +199,5 @@ class Trainer:
                       (time_sampe * 1000 / step),
                       self.timer['train time'].diff,
                       self.timer['val time'].diff)
+
+        mlflow.log_metrics({'mae': mae, 'mse': rmse, 'loss': loss}, self.epoch)
