@@ -13,6 +13,7 @@ import transformations as trans
 
 cfg_data = EasyDict()
 
+
 cfg_data.DATA_PATH = '../dataset/VisDrone2020-CC'
 cfg_data.SIZE = (1080, 1920)
 cfg_data.FILE_EXTENSION = '.jpg'
