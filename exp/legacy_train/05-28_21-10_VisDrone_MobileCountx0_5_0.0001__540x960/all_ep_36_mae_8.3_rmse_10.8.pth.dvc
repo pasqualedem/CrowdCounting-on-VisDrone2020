@@ -1,0 +1,4 @@
+outs:
+- md5: 05365a6cf45e771cf3aa026ec92100cb
+  size: 10775911
+  path: all_ep_36_mae_8.3_rmse_10.8.pth

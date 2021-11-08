@@ -1,0 +1,4 @@
+outs:
+- md5: f85de08d5f177771841b657f108b1f2b
+  size: 11446215
+  path: all_ep_139_mae_7.1_rmse_9.4.pth

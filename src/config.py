@@ -11,8 +11,14 @@ __C.TRAIN_BATCH_SIZE = 6
 __C.VAL_BATCH_SIZE = 6
 __C.TEST_BATCH_SIZE = 6
 __C.N_WORKERS = 2
+__C.SIZE = [540, 960]
 
-__C.PRE_TRAINED = None
+__C.LOSSES = ['RMSE', 'MSE']
+__C.TRAIN = False
+__C.GT_TRANSFORM = False
+
+__C.PRE_TRAINED = '../exp/05-27_18-12_VisDrone_MobileCount_0.0001__1080x1920/all_ep_16_mae_9.8_rmse_12.8.pth'
+__C.OUT_PREDICTIONS = None
 
 # path settings
 __C.EXP_PATH = '../exp'
@@ -28,6 +34,8 @@ __C.LR_DECAY_START = 0  # when training epoch is more than it, the learning rate
 __C.NUM_EPOCH_LR_DECAY = 1  # decay frequency
 __C.MAX_EPOCH = 500
 
+__C.MOMENTUM = 0.95
+
 __C.OPTIM_ADAM = ('Adam',
                   {
                       'lr': __C.LR,
@@ -37,7 +45,7 @@ __C.OPTIM_SGD = ('SGD',
                   {
                       'lr': __C.LR,
                       'weight_decay': __C.W_DECAY,
-                      'momentum': 0.95
+                      'momentum': __C.MOMENTUM
                   })
 
 __C.OPTIM = __C.OPTIM_ADAM  # Chosen optimizer

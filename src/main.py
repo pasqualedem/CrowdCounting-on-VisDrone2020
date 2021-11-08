@@ -2,7 +2,6 @@ import argparse
 
 from ast import literal_eval
 from callbacks import call_dict
-from evaluate import evaluate_model
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from models.CC import CrowdCounter
 from dataset.visdrone import load_test, load_train_val, cfg_data

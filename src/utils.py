@@ -90,10 +90,12 @@ def weights_normal_init(*models):
 def logger(exp_path, exp_name):
     if not os.path.exists(exp_path):
         os.mkdir(exp_path)
-    writer = SummaryWriter(exp_path + '/' + exp_name)
-    log_file = exp_path + '/' + exp_name + '/' + exp_name + '.txt'
+    # writer = SummaryWriter(exp_path + '/' + exp_name)
+    # log_file = exp_path + '/' + exp_name + '/' + exp_name + '.txt'
+    writer = SummaryWriter(exp_path)
+    log_file = exp_path + '/' + 'log.txt'
 
-    cfg_file = open('./config.py', "r")
+    cfg_file = open('params.yaml', "r")
     cfg_lines = cfg_file.readlines()
 
     with open(log_file, 'a') as f:
@@ -133,8 +135,8 @@ def update_model(state_dict, epoch, exp_path, exp_name, scores, train_record, lo
 
     if mae < train_record['best_mae'] or rmse < train_record['best_rmse']:
         train_record['best_model_name'] = snapshot_name
-        torch.save(state_dict, os.path.join(exp_path, exp_name, snapshot_name + '.pth'))
-
+        # torch.save(state_dict, os.path.join(exp_path, exp_name, snapshot_name + '.pth'))
+        torch.save(state_dict, os.path.join(exp_path, 'model.pth'))
     if mae < train_record['best_mae']:
         train_record['best_mae'] = mae
     if rmse < train_record['best_rmse']:

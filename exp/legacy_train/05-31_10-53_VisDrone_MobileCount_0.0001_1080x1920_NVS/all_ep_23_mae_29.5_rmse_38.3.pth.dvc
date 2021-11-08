@@ -1,0 +1,4 @@
+outs:
+- md5: bb0ae5ef8d64a1e1ebe2ffd577e5df61
+  size: 41142959
+  path: all_ep_23_mae_29.5_rmse_38.3.pth

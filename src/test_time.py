@@ -15,7 +15,7 @@ from torchvision.models import vgg16, vgg19, vgg11
 from tabulate import tabulate
 from config import cfg
 from models.CC import CrowdCounter
-from dataset.random import RandomDataset
+from dataset.stochastic import RandomDataset
 
 
 def load_CC(MC):

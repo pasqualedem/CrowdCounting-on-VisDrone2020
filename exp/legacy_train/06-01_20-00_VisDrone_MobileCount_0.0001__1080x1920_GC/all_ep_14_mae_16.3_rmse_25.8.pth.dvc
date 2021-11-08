@@ -1,0 +1,4 @@
+outs:
+- md5: 407d8087b176f072d12d7c208be680cb
+  size: 41142959
+  path: all_ep_14_mae_16.3_rmse_25.8.pth

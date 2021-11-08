@@ -1,0 +1,4 @@
+outs:
+- md5: a68d637fb404b84ee9b9ac3e2779e331
+  size: 27491527
+  path: all_ep_17_mae_41.7_rmse_56.0.pth

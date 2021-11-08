@@ -1,11 +1,24 @@
+from pathlib import Path
+
 from torch import optim
 from torch.optim.lr_scheduler import StepLR
+from ruamel.yaml import YAML
 
 from config import cfg
+from dataset.visdrone import load_train_val, cfg_data
+from models.CC import CrowdCounter
 from utils import *
 import time
 from tqdm import tqdm
 import mlflow
+
+
+def load_CC_train():
+    """
+    Load CrowdCounter model net for training mode
+    """
+    cc = CrowdCounter(cfg.GPU, cfg.NET)
+    return cc
 
 
 optimizers = {
@@ -37,13 +50,16 @@ class Trainer:
         self.epoch = 0
         self.score = np.nan
 
-        if cfg.PRE_TRAINED:
-            checkpoint = torch.load(cfg.PRE_TRAINED)
-            self.net.load_state_dict(checkpoint['model_state_dict'])
-            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-            self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-            self.epoch = checkpoint['epoch']
-            self.score = checkpoint['val loss']
+        if cfg.PRETRAINED and cfg.PRETRAINED != 'None':
+            checkpoint = torch.load(cfg.PRETRAINED)
+            try:
+                self.net.load_state_dict(checkpoint['model_state_dict'])
+                self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+                self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+                self.epoch = checkpoint['epoch']
+                self.score = checkpoint['val loss']
+            except KeyError:
+                self.net.load_state_dict(checkpoint)
 
         self.train_record = {'best_mae': 1e20, 'best_rmse': 1e20, 'best_model_name': ''}
         self.timer = {'iter time': Timer(), 'train time': Timer(), 'val time': Timer()}
@@ -94,7 +110,8 @@ class Trainer:
         norm_pred_count = 0
 
         tk_train = tqdm(
-            enumerate(self.train_loader, 0), total=len(self.train_loader), leave=False,bar_format='{l_bar}{bar:32}{r_bar}',
+            enumerate(self.train_loader, 0), total=len(self.train_loader), leave=False,
+            bar_format='{l_bar}{bar:32}{r_bar}',
             colour='#ff0de7', desc='Train Epoch %d/%d' % (self.epoch, cfg.MAX_EPOCH)
         )
         postfix = {'loss': out_loss, 'lr': self.optimizer.param_groups[0]['lr'],
@@ -201,3 +218,50 @@ class Trainer:
                       self.timer['val time'].diff)
 
         mlflow.log_metrics({'mae': mae, 'mse': rmse, 'loss': loss}, self.epoch)
+
+def initialize_dynamic_params():
+    cfg.OPTIMS = {
+        'Adam': ('Adam',
+                 {
+                     'lr': cfg.LR,
+                     'weight_decay': cfg.W_DECAY,
+                 }),
+        'SGD': ('SGD',
+                {
+                     'lr': cfg.LR,
+                     'weight_decay': cfg.W_DECAY,
+                     'momentum': cfg.MOMENTUM
+                })
+    }
+    cfg.NET = cfg.model.NET
+    cfg.PRETRAINED = cfg.model.PRETRAINED
+    cfg.GPU = cfg.model.GPU
+    now = time.strftime("%m-%d_%H-%M", time.localtime())
+    cfg.EXP_NAME = now \
+                   + '_' + cfg.DATASET \
+                   + '_' + cfg.NET \
+                   + '_' + str(cfg.LR) \
+                   + '_' + cfg.DETAILS
+
+    cfg.OPTIM = cfg.OPTIMS[cfg.OPTIM]
+    cfg_data.SIZE = cfg_data.SIZE
+
+
+if __name__ == '__main__':
+    params_path = Path("params.yaml")
+
+    with open(params_path, 'r') as params_file:
+        yaml = YAML()
+        params = yaml.load(params_file)
+        global_params = params['global']
+        train_params = params['train']
+
+    cfg.update(train_params)
+    cfg_data.update(global_params)
+    initialize_dynamic_params()
+
+    trainer = Trainer(dataloader=load_train_val,
+                      cfg_data=cfg_data,
+                      net_fun=load_CC_train
+                      )
+    trainer.train()
