@@ -1,0 +1,57 @@
+global:
+  DATA_PATH: 'dataset/VisDrone2020-CC'
+  SIZE: [540, 960]
+prepare:
+  GAMMA: 3
+  FILENAME_LEN: 5
+train:
+  model:
+    # Path of checkpoint or None
+    PRETRAINED: None
+    GPU: [ 0 ]
+    NET: 'MobileCount'
+  TRAIN_BATCH_SIZE: 6
+  VAL_BATCH_SIZE: 6
+  N_WORKERS: 2
+  DEVICE: 'cuda'  # cpu or cuda
+
+  # path settings
+  EXP_PATH: 'exp/train'
+  DATASET: 'VisDrone'
+  NET: 'MobileCount'
+  DETAILS: '_dvc_try'
+
+  # learning optimizer settings
+  LR: 1e-3  # learning rate
+  W_DECAY: 1e-4  # weight decay
+  LR_DECAY: 0.995  # decay rate
+  LR_DECAY_START: 0  # when training epoch is more than it, the learning rate will be begin to decay
+  NUM_EPOCH_LR_DECAY: 1  # decay frequency
+  MAX_EPOCH: 1
+
+  MOMENTUM: 0.95 # Used in SGD
+
+  OPTIM: 'Adam' # Chosen optimizer
+
+  PATIENCE: 20
+  EARLY_STOP_DELTA: 1e-2
+
+  PRINT_FREQ: 10
+
+  # ------------------------------VAL------------------------------
+  VAL_SIZE: 0.2
+  VAL_DENSE_START: 1
+  VAL_FREQ: 10  # Before __C.VAL_DENSE_START epoches, the freq is set as __C.VAL_FREQ
+
+#------------------------TEST-----------------------------------------
+evaluate:
+  model:
+    # Path of checkpoint or None
+    PRETRAINED: 'exp/train/model.pth'
+    GPU: [ 0 ]
+    NET: 'MobileCount'
+  BATCH_SIZE: 6
+  N_WORKERS: 4
+  LOSSES: [ 'rmse', 'mae' ]
+  DEVICE: cuda
+  OUT_PREDICTIONS: True

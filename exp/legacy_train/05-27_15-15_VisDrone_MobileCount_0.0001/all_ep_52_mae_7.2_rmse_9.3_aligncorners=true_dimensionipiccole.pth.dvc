@@ -1,0 +1,4 @@
+outs:
+- md5: c51919d6722761098151cbca8fface40
+  size: 13839565
+  path: all_ep_52_mae_7.2_rmse_9.3_aligncorners=true_dimensionipiccole.pth

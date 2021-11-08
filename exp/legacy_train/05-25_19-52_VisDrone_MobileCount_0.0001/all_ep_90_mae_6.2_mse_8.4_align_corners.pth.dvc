@@ -1,0 +1,4 @@
+outs:
+- md5: 5b26fcd496f19f4fe525b7be30edf2a5
+  size: 13839071
+  path: all_ep_90_mae_6.2_mse_8.4_align_corners.pth

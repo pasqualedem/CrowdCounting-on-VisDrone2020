@@ -13,6 +13,7 @@ import transformations as trans
 
 cfg_data = EasyDict()
 
+cfg_data.DATA_PATH = '../dataset/VisDrone2020-CC'
 cfg_data.SIZE = (1080, 1920)
 cfg_data.FILE_EXTENSION = '.jpg'
 cfg_data.GT_FILE_EXTENSION = '.h5'
@@ -24,6 +25,7 @@ cfg_data.BETA_BETA = 2.4
 
 cfg_data.MEAN = [0.43476477, 0.44504763, 0.43252817]
 cfg_data.STD = [0.20490805, 0.19712372, 0.20312176]
+cfg_data.DATA_SUBFOLDER = 'raw'
 
 
 class VisDroneDataset(torch.utils.data.Dataset):
@@ -96,23 +98,27 @@ class VisDroneDataset(torch.utils.data.Dataset):
         return self.targets
 
 
-def make_dataframe(folder):
+def make_dataframe(folder, size):
     """
-    Given a folder requiring to have subfolders each one containing the the frames and the h5 groundtruth,
+    Given a folder requiring to have subfolders each one containing the the frames
+    and a parallel folder containing the .h5 ground truths,
     builds a dataframe tracking all the dataset files
 
     @param folder: the path folder from where build the dataframe
+    @param size: size of the heatmaps required to find them
     @return: a DataFrame with columns (example folder, example idx, filename, gt filename)
     """
     folders = os.listdir(folder)
+    raw_path, subset = os.path.split(folder)
+    data_superpath, _ = os.path.split(raw_path)
+    h5_folder = os.path.join(data_superpath, 'processed', 'heatmaps' + re.sub(', |\(|\)', '_', str(size)), subset)
     dataset = []
     for cur_folder in folders:
         files = os.listdir(os.path.join(folder, cur_folder))
         for file in files:
             if cfg_data.FILE_EXTENSION in file:
                 idx, ext = file.split('.')
-                gt = os.path.join(folder, cur_folder,
-                                  idx + re.sub(', |\(|\)|\[|\]', '_', str(cfg_data.SIZE)) + cfg_data.GT_FILE_EXTENSION)
+                gt = os.path.join(h5_folder, cur_folder, idx + cfg_data.GT_FILE_EXTENSION)
                 dataset.append([idx, os.path.join(folder, cur_folder, file), gt])
     return pd.DataFrame(dataset, columns=['id', 'filename', 'gt_filename'])
 
@@ -122,8 +128,8 @@ def load_test():
     Create a VisDroneDataset object in test mode
     @return: the visdrone testset
     """
-    df = make_dataframe('../dataset/VisDrone2020-CC/test')
-    ds = VisDroneDataset(df, train=False, gt_transform=False)
+    df = make_dataframe(os.path.join(cfg_data.DATA_PATH, cfg_data.DATA_SUBFOLDER, 'test'), cfg_data.SIZE)
+    ds = VisDroneDataset(df, train=cfg.TRAIN, gt_transform=cfg.GT_TRANSFORM)
     return ds
 
 
@@ -137,7 +143,7 @@ def load_train_val():
     # train_df = make_dataframe('../dataset/VisDrone2020-CC/train')
     # valid_df = make_dataframe('../dataset/VisDrone2020-CC/val')
 
-    df = make_dataframe('../dataset/VisDrone2020-CC/train')
+    df = make_dataframe(os.path.join(cfg_data.DATA_PATH, cfg_data.DATA_SUBFOLDER, 'train'), cfg_data.SIZE)
     # Split the dataframe in train and validation
     train_df, valid_df = sklearn.model_selection.train_test_split(
         df, test_size=cfg.VAL_SIZE, shuffle=True
