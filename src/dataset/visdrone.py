@@ -9,7 +9,7 @@ import re
 from config import cfg
 from easydict import EasyDict
 import sklearn.model_selection
-import src.transformations as trans
+import transformations as trans
 
 cfg_data = EasyDict()
 

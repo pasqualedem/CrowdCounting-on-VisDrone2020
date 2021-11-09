@@ -1,11 +1,11 @@
 import torch
 import torchvision
-from src.dataset.run_datasets import VideoDataset
-from src.models.CC import CrowdCounter
-from src.config import cfg
-from src.dataset.run_datasets import make_dataset
-from src.dataset.visdrone import cfg_data
-from src.callbacks import call_dict
+from dataset.run_datasets import VideoDataset
+from models.CC import CrowdCounter
+from config import cfg
+from dataset.run_datasets import make_dataset
+from dataset.visdrone import cfg_data
+from callbacks import call_dict
 
 
 def run_model(model_fun, dataset, batch_size, n_workers, callbacks):
