@@ -10,7 +10,7 @@ from src.run import run_net
 
 app = FastAPI()
 
-@app.post("/predict/num", responses={200: {"description": "returns the predicted number of people in the image", "content": {"json": {"example": {"image_name": "image.jpg", "people_number": "120"}}}}})
+@app.post("/predictions/num", responses={200: {"description": "returns the predicted number of people in the image", "content": {"json": {"example": {"image_name": "image.jpg", "people_number": "120"}}}}})
 async def predictPeopleNumber(file: UploadFile = File(...)):
     with open(f'{file.filename}','wb') as buffer:
         shutil.copyfileobj(file.file, buffer)
@@ -24,7 +24,7 @@ async def predictPeopleNumber(file: UploadFile = File(...)):
 
     return {"image_name": data['img_name'], "peolpe_number": data['count']}
 
-@app.post("/predict/heatmap", responses={200: {"description": "returns the people heatmap", "content": {"image/png": {"example": "No example available."}}}})
+@app.post("/predictions/heatmap", responses={200: {"description": "returns the people heatmap", "content": {"image/png": {"example": "No example available."}}}})
 async def predictHeatmap(file: UploadFile = File(...), download: bool = False):
     with open(f'{file.filename}','wb') as buffer:
         shutil.copyfileobj(file.file, buffer)
@@ -45,7 +45,7 @@ async def predictHeatmap(file: UploadFile = File(...), download: bool = False):
 
     return {"image_name": data['img_name'], "peolpe_number": data['count']}
 
-@app.post("/predict", responses={200: {"description": "returns the people heatmap and the predicted people count in the headers", "content": {"image/png": {"example": "No example available"}}}})
+@app.post("/predictions", responses={200: {"description": "returns the people heatmap and the predicted people count in the headers", "content": {"image/png": {"example": "No example available"}}}})
 async def predictAll(file: UploadFile = File(...)):
     with open(f'{file.filename}','wb') as buffer:
         shutil.copyfileobj(file.file, buffer)

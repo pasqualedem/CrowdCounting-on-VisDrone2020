@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from src.models.MobileCount import MobileCount
+from models.MobileCount import MobileCount
 
 MBVersions = {
     'MobileCountx0_5': [16, 32, 64, 128],
