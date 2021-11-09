@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 import torch
 import cv2
 import numpy as np
-from dataset.visdrone import cfg_data
-from transformations import DeNormalize
+from src.dataset.visdrone import cfg_data
+from src.transformations import DeNormalize
+import json
 
 
 def display_callback(input, prediction, name):
@@ -27,14 +28,20 @@ def count_callback(input, prediction, name):
     """
     prints the counting predicted
     """
-    print(str(name) + ' Count: ' + str(np.round(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA)))
+
+    dict = {'img_name':str(name), 'count': str(np.round(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA))}
+
+    with open("count_results.json", 'w') as fp:
+        json.dump(dict, fp)
+
+    # print(str(name) + ' Count: ' + str(np.round(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA)))
 
 
 def save_callback(input, prediction, name):
     """
     serialize the prediciton image adding .png to the original file name
     """
-    plt.imsave(name + '.png', prediction.squeeze(), cmap='jet')
+    plt.imsave('prediction.png', prediction.squeeze(), cmap='jet')
 
 
 def video_callback(input, prediction, name):

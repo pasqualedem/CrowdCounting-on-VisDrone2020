@@ -1,6 +1,11 @@
 import torch
 import torchvision
-from dataset.run_datasets import VideoDataset
+from src.dataset.run_datasets import VideoDataset
+from src.models.CC import CrowdCounter
+from src.config import cfg
+from src.dataset.run_datasets import make_dataset
+from src.dataset.visdrone import cfg_data
+from src.callbacks import call_dict
 
 
 def run_model(model_fun, dataset, batch_size, n_workers, callbacks):
@@ -53,3 +58,31 @@ def run_transforms(mean, std, size):
                                                                             std=std),
                                            torchvision.transforms.Resize(size)
                                            ])  # normalize to (-1, 1)
+
+
+def load_CC_run():
+
+    """
+    Load CrowdCounter model net for testing mode
+    """
+
+    cc = CrowdCounter([0], cfg.NET)
+    if cfg.PRE_TRAINED:
+        cc.load(cfg.PRE_TRAINED)
+    return cc
+
+def run_net(in_file, callbacks):
+    """
+    Run the model on a given file or folder
+
+    @param in_file: media file or folder of images
+    @param callbacks: list of callbacks to be called after every forward operation
+    """
+    dataset = make_dataset(in_file)
+
+    transforms = run_transforms(cfg_data.MEAN, cfg_data.STD, cfg_data.SIZE)
+    dataset.set_transforms(transforms)
+
+    callbacks_list = [(call_dict[call] if type(call) == str else call) for call in callbacks]
+
+    run_model(load_CC_run, dataset, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, callbacks_list)
