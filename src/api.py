@@ -22,7 +22,7 @@ async def predictPeopleNumber(file: UploadFile = File(...)):
 
     os.remove(file.filename)
 
-    return {"image_name": data['img_name'], "peolpe_number": data['count']}
+    return {"image_name": data['img_name'], "people_number": data['count']}
 
 @app.post("/predict/heatmap", responses={200: {"description": "returns the people heatmap", "content": {"image/png": {"example": "No example available."}}}})
 async def predictHeatmap(file: UploadFile = File(...), download: bool = False):
@@ -43,7 +43,7 @@ async def predictHeatmap(file: UploadFile = File(...), download: bool = False):
 
 
 
-    return {"image_name": data['img_name'], "peolpe_number": data['count']}
+    return {"image_name": data['img_name'], "people_number": data['count']}
 
 @app.post("/predict", responses={200: {"description": "returns the people heatmap and the predicted people count in the headers", "content": {"image/png": {"example": "No example available"}}}})
 async def predictAll(file: UploadFile = File(...)):
@@ -57,7 +57,7 @@ async def predictAll(file: UploadFile = File(...)):
     with open('../count_results.json') as f:
         data = json.load(f)
 
-    results = {"image_name": data['img_name'], "peolpe_number": data['count']}
+    results = {"image_name": data['img_name'], "people_number": data['count']}
 
     path = "prediction.png"
     if os.path.exists(path):
