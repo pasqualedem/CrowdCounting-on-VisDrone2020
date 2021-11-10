@@ -6,10 +6,10 @@ import torchvision
 from PIL import Image as pil
 import h5py
 import re
-from config import cfg
+from src.config import cfg
 from easydict import EasyDict
 import sklearn.model_selection
-import transformations as trans
+import src.transformations as trans
 
 cfg_data = EasyDict()
 

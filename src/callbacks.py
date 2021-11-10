@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import torch
 import cv2
 import numpy as np
-from dataset.visdrone import cfg_data
-from transformations import DeNormalize
+from src.dataset.visdrone import cfg_data
+from src.transformations import DeNormalize
 import json
 
 
