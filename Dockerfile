@@ -35,12 +35,13 @@ ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
 ENV NVIDIA_REQUIRE_CUDA "cuda>=10.2 brand=tesla,driver>=384,driver<385 brand=tesla,driver>=396,driver<397 brand=tesla,driver>=410,driver<411 brand=tesla,driver>=418,driver<419"
 
 
-
-
 COPY requirements.txt requirements.txt
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-COPY . /dockerCrowdCounting
-RUN mkdir -p /dockerCrowdCounting
+## libGL.so
+RUN apt-get update
+RUN apt-get install ffmpeg libsm6 libxext6 -y
+WORKDIR /droneCrowdCounting
+COPY . /droneCrowdCounting
 EXPOSE 80
-CMD ["python", "-m", "dockerCrowdCounting/api.py","--host", "0.0.0.0", "--port", "80"]
+CMD ["python", "src/api.py"]
