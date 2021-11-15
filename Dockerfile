@@ -5,5 +5,5 @@ RUN pip install --upgrade pip && pip install -r requirements.txt && apt-get upda
 
 WORKDIR /droneCrowdCounting
 COPY . /droneCrowdCounting
-EXPOSE 80
+EXPOSE 8000
 CMD ["python", "src/api.py"]
