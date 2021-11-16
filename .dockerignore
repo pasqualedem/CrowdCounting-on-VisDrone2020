@@ -247,4 +247,26 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+#.dvc
+.dvc/config.local
+.dvc/tmp
+.dvc/cache
+
+#.idea
+.idea/shelf/
+.idea/workspace.xml
+
+#dataset
+dataset/VisDrone2020-CC/raw
+dataset/VisDrone2020-CC/pocessed
+
+#exp
+exp/train
+exp/eval
+
+
+
+
+
+
 # End of https://www.toptal.com/developers/gitignore/api/pycharm,python

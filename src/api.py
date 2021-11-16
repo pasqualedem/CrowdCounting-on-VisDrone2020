@@ -162,4 +162,4 @@ async def predictFromVideos(file: UploadFile = File(...), count: bool = True, he
 
 
 if __name__ == '__main__':
-    uvicorn.run("api:app")
+    uvicorn.run("api:app", host="0.0.0.0")
