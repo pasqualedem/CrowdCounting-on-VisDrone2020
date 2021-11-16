@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from PIL import Image
 import matplotlib.pyplot as plt
 import torch
@@ -26,13 +28,21 @@ def display_callback(input, prediction, name):
 
 def count_callback(input, prediction, name):
     """
-    prints the counting predicted
+    prints the counting predicted as a list of dictionaries
     """
-
+    entries = []
     dict = {'img_name':str(name), 'count': str(np.round(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA))}
 
-    with open("count_results.json", 'w') as fp:
-        json.dump(dict, fp)
+    if not os.path.isfile("count_results.json"):
+        entries.append(dict)
+        with open("count_results.json", mode='w') as fp:
+            fp.write(json.dumps(entries, indent=2))    
+    else:
+        with open("count_results.json") as fp:
+            data = json.load(fp)
+        data.append(dict)
+        with open("count_results.json", mode='w') as f:
+            f.write(json.dumps(data, indent=2)) 
 
     # print(str(name) + ' Count: ' + str(np.round(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA)))
 
@@ -41,7 +51,8 @@ def save_callback(input, prediction, name):
     """
     serialize the prediciton image adding .png to the original file name
     """
-    plt.imsave('prediction.png', prediction.squeeze(), cmap='jet')
+    path = os.path.join('tmp/predictions', Path(name).stem) + '.png'
+    plt.imsave(path, prediction.squeeze(), cmap='jet')
 
 
 def video_callback(input, prediction, name):
