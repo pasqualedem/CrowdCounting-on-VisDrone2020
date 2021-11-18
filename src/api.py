@@ -1,19 +1,22 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import io
 import os.path
-from pathlib import Path
 import cv2
-
 import uvicorn
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import FileResponse
+import torch
+import ffmpeg
 import shutil
 import json
+
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import FileResponse, StreamingResponse
 from run import run_net, load_CC_run
-from run import run_net
 from PIL import Image
-import ffmpeg
 from zipfile import ZipFile
+from multiprocessing import Queue
+from dataset.visdrone import cfg_data
+from pathlib import Path
 
 description = """Drone-CrowdCounting API allows you to deal with crowd air view pictures shot with drones
 
@@ -38,6 +41,22 @@ app = FastAPI(
     version="1.0.0",
 )
 model = None
+img_queue = []
+count_queue = []
+
+
+def img_queue_callback(input, prediction, name):
+    """
+
+    """
+    img_queue.append(prediction)
+
+
+def count_queue_callback(input, prediction, name):
+    """
+
+    """
+    count_queue.append(str(np.round(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA)))
 
 
 @app.on_event("startup")
@@ -84,37 +103,21 @@ def _load_model():
     })
 async def predictFromImages(file: UploadFile = File(...), count: bool = True, heatmap: bool = True):
     img = get_array_img(file)
-    img_name = 'img'
-    tmp = 'tmp/predictions'
-    if not os.path.exists(tmp):
-        os.makedirs(tmp)
-    else:
-        for f in os.listdir(tmp):
-            # print(f)
-            os.remove(os.path.join(tmp, f))
-
+    name = file.filename
     if count and not heatmap:
-        run_net(img, ['count_callback'], model)
-
-        with open('count_results.json') as f:
-            data = json.load(f)
-        os.remove('count_results.json')
-        results = {"image_name": data[0]['img_name'], "people_number": data[0]['count']}
-        return results
+        run_net(img, [count_queue_callback], model)
+        return {'img_name': str(name), 'count': count_queue.pop(0)}
 
     if heatmap and not count:
-        run_net(img, ['save_callback'], model)
-        path = os.path.join(tmp, Path(img_name).stem + '.png')
-        return FileResponse(path, media_type="image/png")
+        run_net(img, [img_queue_callback], model)
+        prediction = img_queue.pop(0)
+        return StreamingResponse(get_bytes_img(prediction), media_type="image/png")
 
     if heatmap and count:
-        run_net(img, ['count_callback', 'save_callback'], model)
-        path = os.path.join(tmp, '0.png')
-        with open('count_results.json') as f:
-            data = json.load(f)
-        results = {"image_name": data[0]['img_name'], "people_number": data[0]['count']}
-        os.remove('count_results.json')
-        return FileResponse(path, headers=results, media_type="image/png")
+        run_net(img, [img_queue_callback, count_queue_callback], model)
+        results = {'img_name': str(name), 'count': count_queue.pop(0)}
+        prediction = img_queue.pop(0)
+        return StreamingResponse(get_bytes_img(prediction), headers=results, media_type="image/png")
 
     if not count and not heatmap:
         raise HTTPException(status_code=404, detail="Why predict something and not wanting any result?")
@@ -178,7 +181,7 @@ async def predictFromVideos(file: UploadFile = File(...), count: bool = True, he
             os.remove(os.path.join(tmp, f))
 
     if count and not heatmap:
-        run_net(file.filename, ['count_callback'], model)
+        run_net(file.filename, [count_queue_callback], model)
         os.remove(file.filename)
         with open('count_results.json') as f:
             data = json.load(f)
@@ -263,6 +266,13 @@ async def predictFromVideos(file: UploadFile = File(...), count: bool = True, he
 def get_array_img(file: UploadFile = File(...)):
     contents = file.file.read()
     return np.array(Image.open(io.BytesIO(contents)))
+
+
+def get_bytes_img(array):
+    bytes_pred = io.BytesIO()
+    plt.imsave(bytes_pred, array.squeeze(), cmap='jet', format='png')
+    bytes_pred.seek(0)
+    return bytes_pred
 
 
 if __name__ == '__main__':

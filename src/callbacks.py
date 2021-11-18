@@ -55,6 +55,14 @@ def save_callback(input, prediction, name):
     plt.imsave(path, prediction.squeeze(), cmap='jet')
 
 
+def save_callback(input, prediction, name):
+    """
+    serialize the prediciton image adding .png to the original file name
+    """
+    path = os.path.join('tmp/predictions', Path(name).stem) + '.png'
+    plt.imsave(path, prediction.squeeze(), cmap='jet')
+
+
 def video_callback(input, prediction, name):
     """
     show image input and prediction into a cv2 window
