@@ -1,4 +1,5 @@
-import base64
+import numpy as np
+import io
 import os.path
 from pathlib import Path
 import cv2
@@ -10,7 +11,7 @@ import shutil
 import json
 from run import run_net, load_CC_run
 from run import run_net
-import glob
+from PIL import Image
 import ffmpeg
 from zipfile import ZipFile
 
@@ -82,9 +83,8 @@ def _load_model():
         }
     })
 async def predictFromImages(file: UploadFile = File(...), count: bool = True, heatmap: bool = True):
-    with open(f'{file.filename}', 'wb') as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
+    img = get_array_img(file)
+    img_name = 'img'
     tmp = 'tmp/predictions'
     if not os.path.exists(tmp):
         os.makedirs(tmp)
@@ -94,8 +94,8 @@ async def predictFromImages(file: UploadFile = File(...), count: bool = True, he
             os.remove(os.path.join(tmp, f))
 
     if count and not heatmap:
-        run_net(file.filename, ['count_callback'], model)
-        os.remove(file.filename)
+        run_net(img, ['count_callback'], model)
+
         with open('count_results.json') as f:
             data = json.load(f)
         os.remove('count_results.json')
@@ -103,15 +103,13 @@ async def predictFromImages(file: UploadFile = File(...), count: bool = True, he
         return results
 
     if heatmap and not count:
-        run_net(file.filename, ['save_callback'], model)
-        path = os.path.join(tmp, Path(file.filename).stem + '.png')
-        os.remove(file.filename)
+        run_net(img, ['save_callback'], model)
+        path = os.path.join(tmp, Path(img_name).stem + '.png')
         return FileResponse(path, media_type="image/png")
 
     if heatmap and count:
-        run_net(file.filename, ['count_callback', 'save_callback'], model)
-        path = os.path.join(tmp, Path(file.filename).stem + '.png')
-        os.remove(file.filename)
+        run_net(img, ['count_callback', 'save_callback'], model)
+        path = os.path.join(tmp, '0.png')
         with open('count_results.json') as f:
             data = json.load(f)
         results = {"image_name": data[0]['img_name'], "people_number": data[0]['count']}
@@ -260,6 +258,11 @@ async def predictFromVideos(file: UploadFile = File(...), count: bool = True, he
 
     if not count and not heatmap:
         raise HTTPException(status_code=404, detail="Why predict something and not wanting any result?")
+
+
+def get_array_img(file: UploadFile = File(...)):
+    contents = file.file.read()
+    return np.array(Image.open(io.BytesIO(contents)))
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 import torch
 import os
 from PIL import Image as pil
+from PIL.Image import Image
 import numpy as np
 import mimetypes
 import cv2
@@ -26,6 +27,27 @@ class FilesDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.files)
+
+
+class ArrayDataset(torch.utils.data.Dataset):
+    """
+    Dataset torch subclass to load a list of images from main memory
+    """
+    def __init__(self, imgs, transforms=None):
+        self.imgs = imgs
+        self.transforms = transforms
+
+    def set_transforms(self, transforms):
+        self.transforms = transforms
+
+    def __getitem__(self, item):
+        data = self.imgs[item]
+        if self.transforms:
+            data = self.transforms(data)
+        return data, str(item)
+
+    def __len__(self):
+        return len(self.imgs)
 
 
 class FolderDataset(FilesDataset):
@@ -86,4 +108,7 @@ def make_dataset(input):
                     return VideoDataset(input)
     elif issubclass(type(input), list):
         return FilesDataset(input)
+    elif issubclass(type(input), np.ndarray):
+        return ArrayDataset([input])
+    print(type(input))
     raise Exception('Input type not recognized!')
