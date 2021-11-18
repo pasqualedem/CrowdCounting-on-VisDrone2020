@@ -8,11 +8,11 @@ from dataset.visdrone import cfg_data
 from callbacks import call_dict
 
 
-def run_model(model_fun, dataset, batch_size, n_workers, callbacks):
+def run_model(model, dataset, batch_size, n_workers, callbacks):
     """
     Run the model on a given dataset
 
-    @param model_fun: function that returns the model
+    @param model: Torch model
     @param dataset: torch Dataset object
     @param batch_size: batch size for parallel computing
     @param n_workers: n° of workers for parallel process
@@ -22,7 +22,6 @@ def run_model(model_fun, dataset, batch_size, n_workers, callbacks):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Running using device: ' + str(device))
 
-    model = model_fun()
     # Setup the data loader
     if type(dataset) == VideoDataset:
         n_workers = 0
@@ -71,18 +70,22 @@ def load_CC_run():
         cc.load(cfg.PRE_TRAINED)
     return cc
 
-def run_net(in_file, callbacks):
+def run_net(in_file, callbacks, model=None):
     """
     Run the model on a given file or folder
 
     @param in_file: media file or folder of images
     @param callbacks: list of callbacks to be called after every forward operation
+    @param model: torch model
     """
     dataset = make_dataset(in_file)
 
     transforms = run_transforms(cfg_data.MEAN, cfg_data.STD, cfg_data.SIZE)
     dataset.set_transforms(transforms)
 
+    if model == None:
+        model = load_CC_run()
+
     callbacks_list = [(call_dict[call] if type(call) == str else call) for call in callbacks]
 
-    run_model(load_CC_run, dataset, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, callbacks_list)
+    run_model(model, dataset, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, callbacks_list)

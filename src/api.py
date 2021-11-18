@@ -6,9 +6,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 import shutil
 import json
-from run import run_net
-
-
+from run import run_net, load_CC_run
 
 description = """Drone-CrowdCounting API allows you to deal with crowd air view pictures shot with drones
 
@@ -27,67 +25,76 @@ You will be able to:
 
 """
 
-
 app = FastAPI(
-    title = "Drone-CrowdCounting 👥🚁",
-    description = description,
-    version = "1.0.0",
+    title="Drone-CrowdCounting 👥🚁",
+    description=description,
+    version="1.0.0",
 )
+model = None
 
-        
+
+@app.on_event("startup")
+def _load_model():
+    """
+    Loads the model given in the config
+    """
+    model = load_CC_run()
+    model.eval()
+    print('Model correctly loaded')
+
+
 @app.post(
-    "/predictions/images", 
-    summary = "Given a picture in input returns either a heatmap or people count or both",
-    description = "Given a picture, you can choose to make the system generate a heatmap and/or people count using query parameters. <br><br> \
+    "/predictions/images",
+    summary="Given a picture in input returns either a heatmap or people count or both",
+    description="Given a picture, you can choose to make the system generate a heatmap and/or people count using query parameters. <br><br> \
         ?count=true&heatmap=true => both generated <br> \
         ?count=true&heatmap=false => only count returned <br> \
         ?count=false&heatmap=true => only heatmap returned  ",
-     responses= {
-         200: {
+    responses={
+        200: {
             "description": "Returns the predicted number of people in the image and/or the heatmap",
-            "content" : {
-                "application/json" : {
-                    "example" : {  
+            "content": {
+                "application/json": {
+                    "example": {
                         "image_name": "00002.jpg",
-                         "people_number": "189.0"
-                        
+                        "people_number": "189.0"
+
                     }
-                 }
+                }
             }
         },
         404: {
             "description": "Error returned: API call without any parameter set on true ",
-            "content" : {
-                "application/json" : {
-                    "example" : {  
+            "content": {
+                "application/json": {
+                    "example": {
                         "detail": "Why predict something and not wanting any result?"
                     }
-                 }
+                }
 
             }
         }
     })
 async def predictFromImages(file: UploadFile = File(...), count: bool = True, heatmap: bool = True):
-
-    with open(f'{file.filename}','wb') as buffer:
+    with open(f'{file.filename}', 'wb') as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     path = "prediction.png"
 
     if count and not heatmap:
-        run_net(file.filename, ['count_callback'])
+        run_net(file.filename, ['count_callback'], model)
         os.remove(file.filename)
         with open('count_results.json') as f:
             data = json.load(f)
         return {"image_name": data['img_name'], "people_number": data['count']}
 
     if heatmap and not count:
-        run_net(file.filename, ['save_callback'])
+        run_net(file.filename, ['save_callback'], model)
         os.remove(file.filename)
         return FileResponse(path, media_type="image/png")
 
     if heatmap and count:
-        run_net(file.filename, ['count_callback', 'save_callback'])
+        run_net(file.filename, ['count_callback', 'save_callback'], model)
         os.remove(file.filename)
         with open('count_results.json') as f:
             data = json.load(f)
@@ -98,59 +105,57 @@ async def predictFromImages(file: UploadFile = File(...), count: bool = True, he
         raise HTTPException(status_code=404, detail="Why predict something and not wanting any result?")
 
 
-
 @app.post(
     "/predictions/videos",
-    summary = "Given a video in input returns either a heatmap or people count or both per frame",
-    description = "Given a video, you can choose to make the system generate a heatmap and/or people count per frame using query parameters. <br><br> \
+    summary="Given a video in input returns either a heatmap or people count or both per frame",
+    description="Given a video, you can choose to make the system generate a heatmap and/or people count per frame using query parameters. <br><br> \
         ?count=true&heatmap=true => both generated <br> \
         ?count=true&heatmap=false => only count returned <br> \
         ?count=false&heatmap=true => only heatmap returned  ",
-     responses= {
-         200: {
+    responses={
+        200: {
             "description": "Returns the predicted number of people in the video and/or the heatmap per frame",
-            "content" : {
-                "application/json" : {
-                    "example" : {  
+            "content": {
+                "application/json": {
+                    "example": {
                         "# to be defined "
-                        
+
                     }
-                 }
+                }
             }
         },
         404: {
             "description": "Error returned: API call without any parameter set on true ",
-            "content" : {
-                "application/json" : {
-                    "example" : {  
+            "content": {
+                "application/json": {
+                    "example": {
                         "detail": "Why predict something and not wanting any result?"
                     }
-                 }
+                }
 
             }
         }
     })
 async def predictFromVideos(file: UploadFile = File(...), count: bool = True, heatmap: bool = True):
-
-    with open(f'{file.filename}','wb') as buffer:
+    with open(f'{file.filename}', 'wb') as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     path = "prediction.png"
 
     if count and not heatmap:
-        run_net(file.filename, ['count_callback'])
+        run_net(file.filename, ['count_callback'], model)
         os.remove(file.filename)
         with open('count_results.json') as f:
             data = json.load(f)
         return {"image_name": data['img_name'], "people_number": data['count']}
 
     if heatmap and not count:
-        run_net(file.filename, ['save_callback'])
+        run_net(file.filename, ['save_callback'], model)
         os.remove(file.filename)
         return FileResponse(path, media_type="image/png")
 
     if heatmap and count:
-        run_net(file.filename, ['count_callback','save_callback'])
+        run_net(file.filename, ['count_callback', 'save_callback'], model)
         os.remove(file.filename)
         with open('count_results.json') as f:
             data = json.load(f)
@@ -162,4 +167,4 @@ async def predictFromVideos(file: UploadFile = File(...), count: bool = True, he
 
 
 if __name__ == '__main__':
-    uvicorn.run("api:app")
+    uvicorn.run("api:app", host="0.0.0.0",  reload=True, reload_dirs=['src'])
