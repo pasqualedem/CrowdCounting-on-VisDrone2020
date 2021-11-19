@@ -7,16 +7,15 @@ import os.path
 import cv2
 import uvicorn
 import torch
-import ffmpeg
 import shutil
 import uuid
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from starlette.background import BackgroundTasks
+from http import HTTPStatus
 from run import run_net, load_CC_run
 from PIL import Image
-from zipfile import ZipFile
 from dataset.visdrone import cfg_data
 from pathlib import Path
 
@@ -76,6 +75,18 @@ def _del_tmp():
     shutil.rmtree('tmp')
 
 
+@app.get("/", tags=["General"])  # path operation decorator
+def _index(request: Request):
+    """Root endpoint."""
+
+    response = {
+        "message": HTTPStatus.OK.phrase,
+        "status-code": HTTPStatus.OK,
+        "data": {"message": "Welcome to Drone-CrowdCounting! Please, read the `/docs`!"},
+    }
+    return response
+
+
 @app.post(
     "/predictions/images",
     summary="Given a picture in input returns either a heatmap or people count or both",
@@ -108,7 +119,8 @@ def _del_tmp():
 
             }
         }
-    })
+    },
+    tags=["Prediction"])
 async def predictFromImages(file: UploadFile = File(...), count: bool = True, heatmap: bool = True):
     img = get_array_img(file)
     name = file.filename
@@ -176,7 +188,8 @@ async def predictFromImages(file: UploadFile = File(...), count: bool = True, he
                 }
             }
         }
-    })
+    },
+    tags=["Prediction"])
 async def predictFromVideos(background_tasks: BackgroundTasks, file: UploadFile = File(...), count: bool = True, heatmap: bool = True):
     tmp = os.path.join('tmp', uuid.uuid4().hex)
     tmp_heats = os.path.join(tmp, 'heatmaps')
