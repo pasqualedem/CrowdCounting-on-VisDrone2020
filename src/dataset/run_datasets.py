@@ -1,10 +1,10 @@
 import torch
 import os
 from PIL import Image as pil
-from PIL.Image import Image
 import numpy as np
 import mimetypes
 import cv2
+from starlette.datastructures import UploadFile
 
 
 class FilesDataset(torch.utils.data.Dataset):
@@ -78,11 +78,19 @@ class VideoDataset(torch.utils.data.Dataset):
     def __getitem__(self, item):
         ret, data = self.video.read()
         data = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
-
         if self.transforms:
             data = self.transforms(data)
         self.frame_count += 1
         return data, str(self.frame_count - 1)
+
+
+def mime_recognize(filename):
+    mimetypes.init()
+    mimestart = mimetypes.guess_type(filename)[0]
+
+    if mimestart != None:
+        mimestart = mimestart.split('/')[0]
+    return mimestart
 
 
 def make_dataset(input):
@@ -96,19 +104,18 @@ def make_dataset(input):
         if os.path.isdir(input):
             return FolderDataset(input)
         elif os.path.isfile(input):
-            mimetypes.init()
-            mimestart = mimetypes.guess_type(input)[0]
-
-            if mimestart != None:
-                mimestart = mimestart.split('/')[0]
-
-                if mimestart == 'image':
-                    return FilesDataset([input])
-                if mimestart == 'video':
-                    return VideoDataset(input)
+            mimetype = mime_recognize(input)
+            if mimetype == 'image':
+                return FilesDataset([input])
+            if mimetype == 'video':
+                return VideoDataset(input)
     elif issubclass(type(input), list):
         return FilesDataset(input)
     elif issubclass(type(input), np.ndarray):
         return ArrayDataset([input])
+    elif issubclass(type(input), UploadFile):
+        mimetype = mime_recognize(input.filename)
+        if mimetype == 'image':
+            return FilesDataset([input.file])
     print(type(input))
     raise Exception('Input type not recognized!')

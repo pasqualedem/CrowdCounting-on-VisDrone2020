@@ -51,15 +51,7 @@ def save_callback(input, prediction, name):
     """
     serialize the prediciton image adding .png to the original file name
     """
-    path = os.path.join('tmp/predictions', Path(name).stem) + '.png'
-    plt.imsave(path, prediction.squeeze(), cmap='jet')
-
-
-def save_callback(input, prediction, name):
-    """
-    serialize the prediciton image adding .png to the original file name
-    """
-    path = os.path.join('tmp/predictions', Path(name).stem) + '.png'
+    path = os.path.join('predictions', Path(name).stem) + '.png'
     plt.imsave(path, prediction.squeeze(), cmap='jet')
 
 

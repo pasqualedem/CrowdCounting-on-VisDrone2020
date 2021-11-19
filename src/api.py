@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 import matplotlib.pyplot as plt
 import io
@@ -7,14 +9,14 @@ import uvicorn
 import torch
 import ffmpeg
 import shutil
-import json
+import uuid
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
+from starlette.background import BackgroundTasks
 from run import run_net, load_CC_run
 from PIL import Image
 from zipfile import ZipFile
-from multiprocessing import Queue
 from dataset.visdrone import cfg_data
 from pathlib import Path
 
@@ -67,6 +69,11 @@ def _load_model():
     model = load_CC_run()
     model.eval()
     print('Model correctly loaded')
+
+
+@app.on_event("shutdown")
+def _del_tmp():
+    shutil.rmtree('tmp')
 
 
 @app.post(
@@ -168,99 +175,88 @@ async def predictFromImages(file: UploadFile = File(...), count: bool = True, he
             }
         }
     })
-async def predictFromVideos(file: UploadFile = File(...), count: bool = True, heatmap: bool = True):
-    with open(f'{file.filename}', 'wb') as buffer:
+async def predictFromVideos(background_tasks: BackgroundTasks, file: UploadFile = File(...), count: bool = True, heatmap: bool = True):
+    tmp = os.path.join('tmp', uuid.uuid4().hex)
+    tmp_heats = os.path.join(tmp, 'heatmaps')
+    os.makedirs('tmp', exist_ok=True)
+    os.makedirs(tmp, exist_ok=True)
+    os.makedirs(tmp_heats, exist_ok=True)
+    tmp_filename = os.path.join(tmp, file.filename)
+    background_tasks.add_task(delete_files, tmp)
+
+    with open(f'{tmp_filename}', 'wb') as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    tmp = 'tmp/predictions'
-    if not os.path.exists(tmp):
-        os.makedirs(tmp)
-    else:
-        for f in os.listdir(tmp):
-            # print(f)
-            os.remove(os.path.join(tmp, f))
+    def tmp_save_callback(input, prediction, name):
+        path = os.path.join(tmp_heats, Path(name).stem) + '.png'
+        plt.imsave(path, prediction.squeeze(), cmap='jet')
 
     if count and not heatmap:
-        run_net(file.filename, [count_queue_callback], model)
-        os.remove(file.filename)
-        with open('count_results.json') as f:
-            data = json.load(f)
-        os.remove('count_results.json')
-        results = []
-        for i in range(len(data)):
-            results.append({"video_frame": data[i]['img_name'], "people_number": data[i]['count']})
-        return results
+        run_net(tmp_filename, [count_queue_callback], model)
+        response = [{"video_frame": str(i), "people_number": count_queue.pop(0)} for i in range(len(count_queue))]
 
     if heatmap and not count:
-        run_net(file.filename, ['save_callback'], model)
-        file_name = Path(file.filename).stem + '_heatmap{}'.format(os.path.splitext(file.filename)[1])
-        file_path = os.path.join(tmp, file_name)
-        list_pred = os.path.join(tmp, 'list.txt')
-        cap = cv2.VideoCapture(file.filename)
-        os.remove(file.filename)
-
-        # generate file list for heatmaps
-        f = open(list_pred, "w")
-        for i in range(len(os.listdir(tmp)) - 1):
-            f.write('file {}.png \n'.format(i))
-        f.close()
-
-        fps = cap.get(cv2.CAP_PROP_FPS)
-
-        # generate a video from the heatmaps obtained from each frame
-        (
-            ffmpeg
-                .input(list_pred, r=fps, f='concat', safe='0')
-                .output(file_path)
-                .run()
-        )
-        return FileResponse(file_path, media_type="video/mp4", filename=file_name)
+        run_net(tmp_filename, [tmp_save_callback], model)
+        heat_path, heat_filename = make_video(tmp, file.filename, tmp_filename, tmp_heats)
+        response = FileResponse(heat_path, media_type="video/mp4", filename=heat_filename)
 
     if heatmap and count:
-        run_net(file.filename, ['count_callback', 'save_callback'], model)
-        file_name = Path(file.filename).stem + '_heatmap{}'.format(os.path.splitext(file.filename)[1])
-        file_path = os.path.join(tmp, file_name)
-        list_pred = os.path.join(tmp, 'list.txt')
-        cap = cv2.VideoCapture(file.filename)
-        os.remove(file.filename)
+        run_net(tmp_filename, [count_queue_callback, tmp_save_callback], model)
+        heat_path, heat_filename = make_video(tmp, file.filename, tmp_filename, tmp_heats)
+        counts = [{"video_frame": str(i), "people_number": count_queue.pop(0)} for i in range(len(count_queue))]
+        count_filename = 'count_results.json'
+        count_file = os.path.join(tmp, count_filename)
+        with open(count_file, mode='w') as fp:
+            fp.write(json.dumps(counts, indent=2))
 
-        # generate file list for heatmaps
-        f = open(list_pred, "w")
-        for i in range(len(os.listdir(tmp)) - 1):
-            f.write('file {}.png \n'.format(i))
-        f.close()
-
-        fps = cap.get(cv2.CAP_PROP_FPS)
-
-        # generate a video from the heatmaps obtained from each frame
-        (
-            ffmpeg
-                .input(list_pred, r=fps, f='concat', safe='0')
-                .output(file_path)
-                .run()
-        )
-
-        count_file = '{}_people_count.json'.format(Path(file_path).stem)
-        os.rename('count_results.json', count_file)
-
-        zipfilename = Path(file_path).stem + '_results'
+        zipfilename = Path(heat_path).stem + '_results'
         zipfilepath = os.path.join(tmp, zipfilename)
 
         zipfile = ZipFile('{}.zip'.format(zipfilepath), 'w')
         root = os.getcwd()
         os.chdir(tmp)
-        zipfile.write(file_name)
+        zipfile.write(heat_filename)
         os.chdir(root)
-        zipfile.write(count_file)
+        zipfile.write(count_filename)
         zipfile.close()
         zipfilename = zipfilename + '.zip'
         zipfilepath = zipfilepath + '.zip'
         os.remove(count_file)
 
-        return FileResponse(zipfilepath, media_type="application/x-zip-compressed", filename=zipfilename)
+        response = FileResponse(zipfilepath, media_type="application/x-zip-compressed", filename=zipfilename)
 
     if not count and not heatmap:
         raise HTTPException(status_code=404, detail="Why predict something and not wanting any result?")
+
+    return response
+
+
+def delete_files(path: str) -> None:
+    shutil.rmtree(path)
+
+
+def make_video(tmp, filename, tmp_filename, tmp_heats):
+    file_name = Path(tmp_filename).stem + '_heatmap{}'.format(os.path.splitext(filename)[1])
+    file_path = os.path.join(tmp, file_name)
+    cap = cv2.VideoCapture(tmp_filename)
+
+    # generate file list for heatmaps
+    frames = os.listdir(tmp_heats)
+    frames.sort(key=lambda fname: int(fname.split('.')[0]))
+    frames = [os.path.join(tmp_heats, frame) for frame in frames]
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    cap.release()
+
+    # generate a video from the heatmaps obtained from each frame
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    video_writer = cv2.VideoWriter(file_path, fourcc, fps, (width, height))
+    for frame in frames:
+        video_writer.write(cv2.imread(frame))
+    # cv2.destroyAllWindows()
+    video_writer.release()
+    return file_path, file_name
 
 
 def get_array_img(file: UploadFile = File(...)):
