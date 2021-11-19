@@ -144,21 +144,21 @@ async def predictFromImages(file: UploadFile = File(...), count: bool = True, he
                 "application/json": {
                     "example": {
                         "detail": [
-                            {"image_name": "0", "people_number": "317.0"},
-                            {"image_name": "1", "people_number": "303.0"},
-                            {"image_name": "2", "people_number": "306.0"},
-                            {"image_name": "3", "people_number": "306.0"},
-                            {"image_name": "4", "people_number": "308.0"},
-                            {"image_name": "5", "people_number": "311.0"},
-                            {"image_name": "6", "people_number": "324.0"},
-                            {"image_name": "7", "people_number": "316.0"},
-                            {"image_name": "8", "people_number": "314.0"},
-                            {"image_name": "9", "people_number": "305.0"},
-                            {"image_name": "10", "people_number": "310.0"},
-                            {"image_name": "11", "people_number": "307.0"},
-                            {"image_name": "12", "people_number": "314.0"},
-                            {"image_name": "13", "people_number": "304.0"},
-                            {"image_name": "14", "people_number": "304.0"}
+                            {"video_frame": "0", "people_number": "317.0"},
+                            {"video_frame": "1", "people_number": "303.0"},
+                            {"video_frame": "2", "people_number": "306.0"},
+                            {"video_frame": "3", "people_number": "306.0"},
+                            {"video_frame": "4", "people_number": "308.0"},
+                            {"video_frame": "5", "people_number": "311.0"},
+                            {"video_frame": "6", "people_number": "324.0"},
+                            {"video_frame": "7", "people_number": "316.0"},
+                            {"video_frame": "8", "people_number": "314.0"},
+                            {"video_frame": "9", "people_number": "305.0"},
+                            {"video_frame": "10", "people_number": "310.0"},
+                            {"video_frame": "11", "people_number": "307.0"},
+                            {"video_frame": "12", "people_number": "314.0"},
+                            {"video_frame": "13", "people_number": "304.0"},
+                            {"video_frame": "14", "people_number": "304.0"}
                         ]
                     }
                 }
@@ -203,27 +203,13 @@ async def predictFromVideos(background_tasks: BackgroundTasks, file: UploadFile 
     if heatmap and count:
         run_net(tmp_filename, [count_queue_callback, tmp_save_callback], model)
         heat_path, heat_filename = make_video(tmp, file.filename, tmp_filename, tmp_heats)
-        counts = [{"video_frame": str(i), "people_number": count_queue.pop(0)} for i in range(len(count_queue))]
+        counts = {str(i): count_queue.pop(0) for i in range(len(count_queue))}
         count_filename = 'count_results.json'
         count_file = os.path.join(tmp, count_filename)
         with open(count_file, mode='w') as fp:
             fp.write(json.dumps(counts, indent=2))
 
-        zipfilename = Path(heat_path).stem + '_results'
-        zipfilepath = os.path.join(tmp, zipfilename)
-
-        zipfile = ZipFile('{}.zip'.format(zipfilepath), 'w')
-        root = os.getcwd()
-        os.chdir(tmp)
-        zipfile.write(heat_filename)
-        os.chdir(root)
-        zipfile.write(count_filename)
-        zipfile.close()
-        zipfilename = zipfilename + '.zip'
-        zipfilepath = zipfilepath + '.zip'
-        os.remove(count_file)
-
-        response = FileResponse(zipfilepath, media_type="application/x-zip-compressed", filename=zipfilename)
+        response = FileResponse(heat_path, headers=counts, media_type="video/mp4", filename=heat_filename)
 
     if not count and not heatmap:
         raise HTTPException(status_code=404, detail="Why predict something and not wanting any result?")
