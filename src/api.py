@@ -93,7 +93,8 @@ def _del_tmp():
                         "people_number": "189.0"
 
                     }
-                }
+                },
+                "image/png": {}
             }
         },
         404: {
@@ -161,7 +162,8 @@ async def predictFromImages(file: UploadFile = File(...), count: bool = True, he
                             {"video_frame": "14", "people_number": "304.0"}
                         ]
                     }
-                }
+                },
+                "video/mp4": {}
             }
         },
         404: {
