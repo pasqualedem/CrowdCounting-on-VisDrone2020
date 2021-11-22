@@ -6,6 +6,7 @@ from config import cfg
 from dataset.run_datasets import make_dataset
 from dataset.visdrone import cfg_data
 from callbacks import call_dict
+from utils import info_print
 
 
 def run_model(model, dataset, batch_size, n_workers, callbacks):
@@ -20,7 +21,7 @@ def run_model(model, dataset, batch_size, n_workers, callbacks):
     @return:
     """
     device = cfg.DEVICE
-    print('Running using device: ' + str(device))
+    info_print('Running using device: ' + str(device))
 
     # Setup the data loader
     if type(dataset) == VideoDataset:

@@ -18,6 +18,7 @@ from run import run_net, load_CC_run
 from PIL import Image
 from dataset.visdrone import cfg_data
 from pathlib import Path
+from utils import info_print
 
 description = """Drone-CrowdCounting API allows you to deal with crowd air view pictures shot with drones
 
@@ -68,7 +69,7 @@ def _load_model():
     model = load_CC_run()
     model.eval()
 
-    print('Model correctly loaded on: ' + str(next(model.parameters()).device))
+    info_print('Model correctly loaded on: ' + str(next(model.parameters()).device))
 
 
 @app.on_event("shutdown")
