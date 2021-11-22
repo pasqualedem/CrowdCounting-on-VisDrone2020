@@ -15,14 +15,15 @@ class CrowdCounter(nn.Module):
     """
     Container class for MobileCount networks
     """
-    def __init__(self, gpus, model_name):
+    def __init__(self, device, model_name):
         super(CrowdCounter, self).__init__()
 
         self.CCN = MobileCount(MBVersions[model_name])
-        if len(gpus) > 1:
-            self.CCN = torch.nn.DataParallel(self.CCN, device_ids=gpus).cuda()
-        else:
-            self.CCN = self.CCN.cuda()
+        if device != 'cpu':
+            if len(device) > 1:
+                self.CCN = torch.nn.DataParallel(self.CCN, device_ids=device).cuda()
+            else:
+                self.CCN = self.CCN.cuda()
         self.loss_mse_fn = nn.MSELoss().cuda()
 
     @property

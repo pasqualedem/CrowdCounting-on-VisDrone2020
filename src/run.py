@@ -19,7 +19,7 @@ def run_model(model, dataset, batch_size, n_workers, callbacks):
     @param callbacks: list of callback function to execute after each item is processed
     @return:
     """
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = cfg.DEVICE
     print('Running using device: ' + str(device))
 
     # Setup the data loader
@@ -64,11 +64,17 @@ def load_CC_run():
     """
     Load CrowdCounter model net for testing mode
     """
+    if cfg.DEVICE == 'cuda' and torch.cuda.is_available():
+        device = [0]
+    else:
+        device = 'cpu'
+        cfg.DEVICE = 'cpu'
 
-    cc = CrowdCounter([0], cfg.NET)
+    cc = CrowdCounter(device, cfg.NET)
     if cfg.PRE_TRAINED:
         cc.load(cfg.PRE_TRAINED)
     return cc
+
 
 def run_net(in_file, callbacks, model=None):
     """

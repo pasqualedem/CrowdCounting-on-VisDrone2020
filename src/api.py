@@ -67,7 +67,8 @@ def _load_model():
     """
     model = load_CC_run()
     model.eval()
-    print('Model correctly loaded')
+
+    print('Model correctly loaded on: ' + str(next(model.parameters()).device))
 
 
 @app.on_event("shutdown")
