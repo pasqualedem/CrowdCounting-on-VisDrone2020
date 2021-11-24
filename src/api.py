@@ -102,8 +102,8 @@ def _index(request: Request):
             "content": {
                 "application/json": {
                     "example": {
-                        "image_name": "00002.jpg",
-                        "people_number": "189.0"
+                        "img_name": "00002.jpg",
+                        "count": "189.0"
 
                     }
                 },
@@ -159,21 +159,21 @@ async def predictFromImages(file: UploadFile = File(...), count: bool = True, he
                 "application/json": {
                     "example": {
                         "detail": [
-                            {"video_frame": "0", "people_number": "317.0"},
-                            {"video_frame": "1", "people_number": "303.0"},
-                            {"video_frame": "2", "people_number": "306.0"},
-                            {"video_frame": "3", "people_number": "306.0"},
-                            {"video_frame": "4", "people_number": "308.0"},
-                            {"video_frame": "5", "people_number": "311.0"},
-                            {"video_frame": "6", "people_number": "324.0"},
-                            {"video_frame": "7", "people_number": "316.0"},
-                            {"video_frame": "8", "people_number": "314.0"},
-                            {"video_frame": "9", "people_number": "305.0"},
-                            {"video_frame": "10", "people_number": "310.0"},
-                            {"video_frame": "11", "people_number": "307.0"},
-                            {"video_frame": "12", "people_number": "314.0"},
-                            {"video_frame": "13", "people_number": "304.0"},
-                            {"video_frame": "14", "people_number": "304.0"}
+                            {"video_frame": "0", "count": "317.0"},
+                            {"video_frame": "1", "count": "303.0"},
+                            {"video_frame": "2", "count": "306.0"},
+                            {"video_frame": "3", "count": "306.0"},
+                            {"video_frame": "4", "count": "308.0"},
+                            {"video_frame": "5", "count": "311.0"},
+                            {"video_frame": "6", "count": "324.0"},
+                            {"video_frame": "7", "count": "316.0"},
+                            {"video_frame": "8", "count": "314.0"},
+                            {"video_frame": "9", "count": "305.0"},
+                            {"video_frame": "10", "count": "310.0"},
+                            {"video_frame": "11", "count": "307.0"},
+                            {"video_frame": "12", "count": "314.0"},
+                            {"video_frame": "13", "count": "304.0"},
+                            {"video_frame": "14", "count": "304.0"}
                         ]
                     }
                 },
@@ -210,7 +210,7 @@ async def predictFromVideos(background_tasks: BackgroundTasks, file: UploadFile 
 
     if count and not heatmap:
         run_net(tmp_filename, [count_queue_callback], model)
-        response = [{"video_frame": str(i), "people_number": count_queue.pop(0)} for i in range(len(count_queue))]
+        response = [{"video_frame": str(i), "count": count_queue.pop(0)} for i in range(len(count_queue))]
 
     if heatmap and not count:
         run_net(tmp_filename, [tmp_save_callback], model)
