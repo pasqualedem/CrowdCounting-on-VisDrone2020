@@ -39,11 +39,11 @@ class CrowdCounter(nn.Module):
     def predict(self, img):
         return self(img)
 
-    def load(self, model_path):
+    def load(self, model_path, map_location):
         try:
-            self.load_state_dict(torch.load(model_path)['model_state_dict'])
+            self.load_state_dict(torch.load(model_path, map_location)['model_state_dict'])
         except KeyError:
-            self.load_state_dict(torch.load(model_path))  # Retrocompatibility
+            self.load_state_dict(torch.load(model_path, map_location))  # Retrocompatibility
 
     def build_loss(self, density_map, gt_data):
         self.loss_mse = self.loss_mse_fn(density_map.squeeze(), gt_data.squeeze())

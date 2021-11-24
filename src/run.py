@@ -73,7 +73,7 @@ def load_CC_run():
 
     cc = CrowdCounter(device, cfg.NET)
     if cfg.PRE_TRAINED:
-        cc.load(cfg.PRE_TRAINED)
+        cc.load(cfg.PRE_TRAINED, map_location= torch.device(cfg.DEVICE))
     return cc
 
 
