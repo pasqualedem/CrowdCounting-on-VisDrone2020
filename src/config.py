@@ -17,7 +17,7 @@ __C.LOSSES = ['RMSE', 'MSE']
 __C.TRAIN = False
 __C.GT_TRANSFORM = False
 
-__C.PRE_TRAINED = 'exp/legacy_train/05-27_18-12_VisDrone_MobileCount_0.0001__1080x1920/all_ep_16_mae_9.8_rmse_12.8.pth'
+__C.PRE_TRAINED = 'exp/model.pth'
 __C.OUT_PREDICTIONS = None
 
 # path settings

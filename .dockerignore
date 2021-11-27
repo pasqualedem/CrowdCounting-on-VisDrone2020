@@ -258,11 +258,12 @@ cython_debug/
 
 #dataset
 dataset/VisDrone2020-CC/raw
-dataset/VisDrone2020-CC/pocessed
+dataset/VisDrone2020-CC/processed
 
 #exp
 exp/train
 exp/eval
+exp/legacy_train
 
 
 
