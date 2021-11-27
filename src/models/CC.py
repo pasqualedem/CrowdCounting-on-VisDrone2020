@@ -15,14 +15,15 @@ class CrowdCounter(nn.Module):
     """
     Container class for MobileCount networks
     """
-    def __init__(self, gpus, model_name):
+    def __init__(self, device, model_name):
         super(CrowdCounter, self).__init__()
 
         self.CCN = MobileCount(MBVersions[model_name])
-        if len(gpus) > 1:
-            self.CCN = torch.nn.DataParallel(self.CCN, device_ids=gpus).cuda()
-        else:
-            self.CCN = self.CCN.cuda()
+        if device != 'cpu':
+            if len(device) > 1:
+                self.CCN = torch.nn.DataParallel(self.CCN, device_ids=device).cuda()
+            else:
+                self.CCN = self.CCN.cuda()
         self.loss_mse_fn = nn.MSELoss().cuda()
 
     @property
@@ -38,11 +39,11 @@ class CrowdCounter(nn.Module):
     def predict(self, img):
         return self(img)
 
-    def load(self, model_path):
+    def load(self, model_path, map_location):
         try:
-            self.load_state_dict(torch.load(model_path)['model_state_dict'])
+            self.load_state_dict(torch.load(model_path, map_location)['model_state_dict'])
         except KeyError:
-            self.load_state_dict(torch.load(model_path))  # Retrocompatibility
+            self.load_state_dict(torch.load(model_path, map_location))  # Retrocompatibility
 
     def build_loss(self, density_map, gt_data):
         self.loss_mse = self.loss_mse_fn(density_map.squeeze(), gt_data.squeeze())
