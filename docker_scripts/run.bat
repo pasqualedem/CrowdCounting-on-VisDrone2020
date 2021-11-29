@@ -1,2 +1,2 @@
-docker run -it -p 8000:8000 visdrone
+docker run -it --name visdrone_cpu -p 8000:8000 visdrone
 PAUSE
