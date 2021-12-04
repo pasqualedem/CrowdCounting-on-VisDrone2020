@@ -205,22 +205,23 @@ async def predictFromVideos(background_tasks: BackgroundTasks, file: UploadFile 
 
     with open(f'{tmp_filename}', 'wb') as buffer:
         shutil.copyfileobj(file.file, buffer)
+    frames_folder = save_video(tmp_filename, tmp)
 
     def tmp_save_callback(input, prediction, name):
         path = os.path.join(tmp_heats, Path(name).stem) + '.png'
         plt.imsave(path, prediction.squeeze(), cmap='jet')
 
     if count and not heatmap:
-        run_net(tmp_filename, [count_queue_callback], model)
+        run_net(frames_folder, [count_queue_callback], model)
         response = [{"video_frame": str(i), "count": count_queue.pop(0)} for i in range(len(count_queue))]
 
     if heatmap and not count:
-        run_net(tmp_filename, [tmp_save_callback], model)
+        run_net(frames_folder, [tmp_save_callback], model)
         heat_path, heat_filename = make_video(tmp, file.filename, tmp_filename, tmp_heats)
         response = FileResponse(heat_path, media_type="video/mp4", filename=heat_filename)
 
     if heatmap and count:
-        run_net(tmp_filename, [count_queue_callback, tmp_save_callback], model)
+        run_net(frames_folder, [count_queue_callback, tmp_save_callback], model)
         heat_path, heat_filename = make_video(tmp, file.filename, tmp_filename, tmp_heats)
         counts = {str(i): count_queue.pop(0) for i in range(len(count_queue))}
         count_filename = 'count_results.json'
@@ -238,6 +239,23 @@ async def predictFromVideos(background_tasks: BackgroundTasks, file: UploadFile 
 
 def delete_files(path: str) -> None:
     shutil.rmtree(path)
+
+
+def save_video(file, folder):
+    folder = os.path.join(folder, 'video_folder')
+    os.makedirs(folder, exist_ok=True)
+    video = cv2.VideoCapture(file)
+    digit_len = len(str(int(video.get(cv2.CAP_PROP_FRAME_COUNT))))
+    frame_count = 0
+    while True:
+        ret, data = video.read()
+        if not ret:
+            break
+        data = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
+        Image.fromarray(data).save(
+            os.path.join(folder, str(frame_count).zfill(digit_len) + '.jpg'))
+        frame_count += 1
+    return folder
 
 
 def make_video(tmp, filename, tmp_filename, tmp_heats):
