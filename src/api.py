@@ -51,6 +51,7 @@ def img_queue_callback(input, prediction, name):
     """
 
     """
+    prediction = prediction.to('cpu')
     img_queue.append(prediction)
 
 
@@ -66,6 +67,7 @@ def _load_model():
     """
     Loads the model given in the config
     """
+    global model
     model = load_CC_run()
     model.eval()
 
