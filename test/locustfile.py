@@ -67,7 +67,7 @@ class DroneUser(HttpUser):
     @task(5)
     @tag("prediction", 'image')
     def img_prediction(self):
-        url = "/predictions/images" + self.get_random_params()
+        url = "/predictions/images" + get_random_params()
         img_bytes = random_image()
         files = [
             ('file', ('img.jpg', img_bytes, 'image/jpeg'))
@@ -78,7 +78,7 @@ class DroneUser(HttpUser):
     @task(4)
     @tag("prediction", 'video')
     def video_prediction(self):
-        url = "/predictions/videos" + self.get_random_params()
+        url = "/predictions/videos" + get_random_params()
         video_path = random_video()
         with open(video_path, 'rb') as video_bytes:
             files = [
@@ -88,11 +88,15 @@ class DroneUser(HttpUser):
         os.remove(video_path)
         self.check_stop()
 
-    @classmethod
-    def get_random_params(cls):
-        count = 'count=' + str(bool(np.random.randint(2))).lower()
-        heatmap = 'heatmap=' + str(bool(np.random.randint(2))).lower()
-        return '?' + count + '&' + heatmap
+
+def get_random_params():
+    """
+    Generates random query parameters
+    @return: query parameters string
+    """
+    count = 'count=' + str(bool(np.random.randint(2))).lower()
+    heatmap = 'heatmap=' + str(bool(np.random.randint(2))).lower()
+    return '?' + count + '&' + heatmap
 
 
 def random_image():
