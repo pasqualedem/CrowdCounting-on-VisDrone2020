@@ -56,11 +56,11 @@ class DroneUser(HttpUser):
         if self.cur_runs == self.runs:
             self.stop()
 
-    @task(2)
+    @task(1)
     def root(self):
         self.client.get("/")
 
-    @task(3)
+    @task(1)
     def docs(self):
         self.client.get("/docs")
 
@@ -75,7 +75,7 @@ class DroneUser(HttpUser):
         self.client.post(url, headers={}, data={}, files=files)
         self.check_stop()
 
-    @task(1)
+    @task(4)
     @tag("prediction", 'video')
     def video_prediction(self):
         url = "/predictions/videos" + self.get_random_params()
