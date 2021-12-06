@@ -1,14 +1,16 @@
 import pytest
 from fastapi.testclient import TestClient
 from http import HTTPStatus
-from src.api import app
+from api import app
 import os
 import cv2
 from PIL import Image as pil
 import numpy as np
 import uuid
 import io
+import json
 
+## ATTENZIONE: PER OGNI TEST CREATO, MODIFICARE LA CARTELLA DI ROOT DALLE CONFIGURAZIONI DI TEST!
 ### API TESTING ###
 
 SIZE = (1920, 1080, 3)
@@ -85,7 +87,6 @@ class TestApi:
         ]
 
         response = self.client.post(url, headers={}, data={}, files=[])
-        print(response)
         assert response.json()['detail'][0]['type'] == "value_error.missing"
 
 
@@ -99,11 +100,39 @@ class TestApi:
         assert response.json()['detail'][0]['type'] == "value_error.missing"
 
 
-    def test_apiimg_count(self):
+    def test_apiimg_count_body(self):
         img = random_image()
-        url = "/predictions/videos"
+        url = "/predictions/images"+"?count=True"+"&heatmap=False"
         files = [
             ('file', ('img.jpg', img, 'image/jpeg'))
         ]
         response = self.client.post(url, headers={}, data={}, files=files)
-        assert response.json()['content']['application/json']['example']['count'] >= 0
+        assert response.json()["count"] >="0.0"
+
+    def test_apiimg_type(self):
+        img = random_image()
+        url = "/predictions/images"+"?count=False"+"&heatmap=True"
+        files = [
+            ('file', ('img.jpg', img, 'image/jpeg'))
+        ]
+        response = self.client.post(url, headers={}, data={}, files=files)
+        assert response.headers["content-type"] == "image/png"
+
+    def test_apiimg_noinput_one(self):
+        img = random_image()
+        url = "/predictions/images"+"?count=False"+"&heatmap=False"
+        files = [
+            ('file', ('img.jpg', img, 'image/jpeg'))
+        ]
+        response = self.client.post(url, headers={}, data={}, files=files)
+        text= json.loads(response.text)
+        assert text['detail']=="Why predict something and not wanting any result?"
+
+    def test_apiimg_noinput_two(self):
+        img = random_image()
+        url = "/predictions/images"+"?count=False"+"&heatmap=False"
+        files = [
+            ('file', ('img.jpg', img, 'image/jpeg'))
+        ]
+        response = self.client.post(url, headers={}, data={}, files=files)
+        assert response.status_code == int("404")
