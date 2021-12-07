@@ -88,26 +88,31 @@ class TestApi:
         assert response.status_code == HTTPStatus.OK
         assert response.json()['data']['message'] == "Welcome to Drone-CrowdCounting! Please, read the `/docs`!"
 
+    @pytest.mark.image
     def test_apiimage(self, random_image_payload):
         url = "/predictions/images"
         response = self.client.post(url, headers={}, data={}, files=random_image_payload)
         assert response.status_code == HTTPStatus.OK
 
+    @pytest.mark.video
     def test_apivideo(self, random_video_payload):
         url = "/predictions/videos"
         response = self.client.post(url, headers={}, data={}, files=random_video_payload)
         assert response.status_code == HTTPStatus.OK
 
+    @pytest.mark.video
     def test_apivideo_isnull(self):
         url = "/predictions/videos"
         response = self.client.post(url, headers={}, data={}, files=[])
         assert response.json()['detail'][0]['type'] == "value_error.missing"
 
+    @pytest.mark.image
     def test_apiimg_isnull(self):
         url = "/predictions/videos"
         response = self.client.post(url, headers={}, data={}, files=[])
         assert response.json()['detail'][0]['type'] == "value_error.missing"
 
+    @pytest.mark.image
     @pytest.mark.parametrize(
         "count, heatmap",
         [
@@ -128,6 +133,7 @@ class TestApi:
             text = json.loads(response.text)
             assert text['detail'] == "Why predict something and not wanting any result?"
 
+    @pytest.mark.video
     @pytest.mark.parametrize(
         "count, heatmap",
         [
@@ -152,6 +158,7 @@ class TestApi:
             text = json.loads(response.text)
             assert text['detail'] == "Why predict something and not wanting any result?"
 
+    @pytest.mark.image
     @pytest.mark.parametrize(
         "count, heatmap",
         [
@@ -164,6 +171,7 @@ class TestApi:
         response = self.client.post(url, headers={}, data={}, files=random_image_payload)
         assert response.headers["content-type"] == "image/png"
 
+    @pytest.mark.video
     @pytest.mark.parametrize(
         "count, heatmap",
         [
@@ -176,11 +184,13 @@ class TestApi:
         response = self.client.post(url, headers={}, data={}, files=random_video_payload)
         assert response.headers["content-type"] == "video/mp4"
 
+    @pytest.mark.image
     def test_apiimg_noinput_status_code(self, random_image_payload):
         url = "/predictions/images" + "?count=False" + "&heatmap=False"
         response = self.client.post(url, headers={}, data={}, files=random_image_payload)
         assert response.status_code == int("404")
 
+    @pytest.mark.video
     def test_apivideo_noinput_status_code(self, random_image_payload):
         url = "/predictions/videos" + "?count=False" + "&heatmap=False"
         response = self.client.post(url, headers={}, data={}, files=random_image_payload)
