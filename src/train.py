@@ -219,6 +219,7 @@ class Trainer:
 
         # mlflow.log_metrics({'mae': mae, 'mse': rmse, 'loss': loss}, self.epoch)
 
+
 def initialize_dynamic_params():
     cfg.OPTIMS = {
         'Adam': ('Adam',
@@ -247,7 +248,7 @@ def initialize_dynamic_params():
     cfg_data.SIZE = cfg_data.SIZE
 
 
-def load_yaml_params():
+def load_yaml_train_params():
     params_path = Path("params.yaml")
     with open(params_path, 'r') as params_file:
         yaml = YAML()
@@ -258,7 +259,7 @@ def load_yaml_params():
 
 
 if __name__ == '__main__':
-    train_params, global_params = load_yaml_params()
+    train_params, global_params = load_yaml_train_params()
 
     cfg.update(train_params)
     cfg_data.update(global_params)
