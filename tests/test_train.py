@@ -27,6 +27,7 @@ class TestPreliminarTrain:
         assert type(cfg.OPTIM[0]) == str
         assert type(cfg.OPTIM[1]) == EasyDict
 
+    @pytest.mark.training
     def test_load_CC_train(self):
         model = load_CC_train()
         assert type(model) == CrowdCounter
