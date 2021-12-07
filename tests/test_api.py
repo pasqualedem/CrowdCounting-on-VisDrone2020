@@ -49,6 +49,7 @@ def random_video():
     return file_path
 
 class TestApi:
+
     # Initialize client
     client = TestClient(app)
 
@@ -66,18 +67,14 @@ class TestApi:
         response = self.client.post(url, headers={}, data={}, files=files)
         assert response.status_code == HTTPStatus.OK
 
-
-
     def test_apivideo(self):
         video = random_video()
         url = "/predictions/videos"
         files = [
             ('file', ('video.mp4', video, 'video/mp4'))
         ]
-
         response = self.client.post(url, headers={}, data={}, files=files)
         assert response.status_code == HTTPStatus.OK
-
 
     def test_apivideo_isnull(self):
         video = random_video()
@@ -85,7 +82,6 @@ class TestApi:
         files = [
             ('file', ('video.mp4', video, 'video/mp4'))
         ]
-
         response = self.client.post(url, headers={}, data={}, files=[])
         assert response.json()['detail'][0]['type'] == "value_error.missing"
 
@@ -100,7 +96,7 @@ class TestApi:
         assert response.json()['detail'][0]['type'] == "value_error.missing"
 
 
-    def test_apiimg_count_body(self):
+    def test_apiimg_count_body_one(self):
         img = random_image()
         url = "/predictions/images"+"?count=True"+"&heatmap=False"
         files = [
@@ -108,6 +104,15 @@ class TestApi:
         ]
         response = self.client.post(url, headers={}, data={}, files=files)
         assert response.json()["count"] >="0.0"
+
+    def test_apiimg_count_body_two(self):
+        img = random_image()
+        url="/predictions/images"+"?count=True"+"&heatmap=True"
+        files = [
+            ('file', ('img.jpg', img, 'image/jpeg'))
+        ]
+        response = self.client.post(url, headers={}, data={}, files=files)
+        assert response.headers["count"]>="0.0"
 
     def test_apiimg_type(self):
         img = random_image()
@@ -118,6 +123,15 @@ class TestApi:
         response = self.client.post(url, headers={}, data={}, files=files)
         assert response.headers["content-type"] == "image/png"
 
+    def test_apivideo_type(self):
+        video = random_video()
+        url = "/predictions/videos"+"?count=False"+"&heatmap=True"
+        files = [
+            ('file', ('video.mp4', video, 'video/mp4'))
+        ]
+        response = self.client.post(url, headers={}, data={}, files=files)
+        assert response.headers["content-type"] == "video/mp4"
+
     def test_apiimg_noinput_one(self):
         img = random_image()
         url = "/predictions/images"+"?count=False"+"&heatmap=False"
@@ -126,7 +140,7 @@ class TestApi:
         ]
         response = self.client.post(url, headers={}, data={}, files=files)
         text= json.loads(response.text)
-        assert text['detail']=="Why predict something and not wanting any result?"
+        assert text['detail'] == "Why predict something and not wanting any result?"
 
     def test_apiimg_noinput_two(self):
         img = random_image()
