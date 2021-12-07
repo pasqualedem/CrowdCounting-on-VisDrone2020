@@ -9,15 +9,14 @@ import numpy as np
 import uuid
 import io
 import json
+import tempfile
 
-## ATTENZIONE: PER OGNI TEST CREATO, MODIFICARE LA CARTELLA DI ROOT DALLE CONFIGURAZIONI DI TEST!
-### API TESTING ###
 
 SIZE = (1080, 1920, 3)
 MIN_VIDEO_FRAMES = 50
 MAX_VIDEO_FRAMES = 51
 FPS = 30
-TEMP_DIR = 'tmp_pytest'
+TEMP_DIR = tempfile.mkdtemp()
 
 
 def random_image():
