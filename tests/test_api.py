@@ -121,9 +121,9 @@ class TestApi:
 
         response = self.client.post(url, headers={}, data={}, files=random_image_payload)
         if count and heatmap:
-            assert response.headers["count"] >= "0.0"
+            assert is_number(response.headers["count"])
         elif count and not heatmap:
-            assert response.json()["count"] >= "0.0"
+            assert is_number(response.json()["count"])
         elif not count and not heatmap:
             text = json.loads(response.text)
             assert text['detail'] == "Why predict something and not wanting any result?"
