@@ -11,7 +11,7 @@ import shutil
 import uuid
 
 from fastapi import FastAPI, UploadFile, File, HTTPException, Request
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
 from starlette.background import BackgroundTasks
 from http import HTTPStatus
 from run import run_net, load_CC_run
@@ -212,8 +212,9 @@ async def predictFromVideos(background_tasks: BackgroundTasks, file: UploadFile 
         plt.imsave(path, prediction.squeeze(), cmap='jet')
 
     if count and not heatmap:
-        run_net(frames_folder, [count_queue_callback], model)
-        response = [{"video_frame": str(i), "count": count_queue.pop(0)} for i in range(len(count_queue))]
+        run_net(tmp_filename, [count_queue_callback], model)
+        body = [{"video_frame": str(i), "count": count_queue.pop(0)} for i in range(len(count_queue))]
+        response = JSONResponse(body, headers={'n_frames': str(len(body))})
 
     if heatmap and not count:
         run_net(frames_folder, [tmp_save_callback], model)
@@ -224,6 +225,7 @@ async def predictFromVideos(background_tasks: BackgroundTasks, file: UploadFile 
         run_net(frames_folder, [count_queue_callback, tmp_save_callback], model)
         heat_path, heat_filename = make_video(tmp, file.filename, tmp_filename, tmp_heats)
         counts = {str(i): count_queue.pop(0) for i in range(len(count_queue))}
+        counts['n_frames'] = str(len(counts))
         count_filename = 'count_results.json'
         count_file = os.path.join(tmp, count_filename)
         with open(count_file, mode='w') as fp:
