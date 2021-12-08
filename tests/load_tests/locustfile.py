@@ -122,8 +122,9 @@ def random_video():
     file_path = os.path.join(tmp, 'random_video.mp4')
     # generate a random video
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    video_writer = cv2.VideoWriter(file_path, fourcc, FPS, SIZE[0:2])
+    video_writer = cv2.VideoWriter(file_path, fourcc, FPS, (SIZE[1], SIZE[0]))
     for _ in range(frames):
-        video_writer.write((np.random.rand(*SIZE) * 256).astype('uint8'))
+        frame = (np.random.rand(*SIZE) * 256).astype('uint8')
+        video_writer.write(frame)
     video_writer.release()
     return file_path
