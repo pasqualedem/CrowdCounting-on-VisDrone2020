@@ -212,7 +212,7 @@ async def predictFromVideos(background_tasks: BackgroundTasks, file: UploadFile 
         plt.imsave(path, prediction.squeeze(), cmap='jet')
 
     if count and not heatmap:
-        run_net(tmp_filename, [count_queue_callback], model)
+        run_net(frames_folder, [count_queue_callback], model)
         body = [{"video_frame": str(i), "count": count_queue.pop(0)} for i in range(len(count_queue))]
         response = JSONResponse(body, headers={'n_frames': str(len(body))})
 
