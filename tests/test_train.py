@@ -15,19 +15,19 @@ class TestPreliminarTrain:
         cfg_data.update(self.global_params)
         initialize_dynamic_params()
 
-    @pytest.mark.training
+    @pytest.mark.train
     def test_param_load(self):
         assert issubclass(type(self.train_params), dict)
         assert issubclass(type(self.global_params), dict)
 
-    @pytest.mark.training
+    @pytest.mark.train
     def test_param_init(self):
         assert cfg.GPU
         assert cfg.PRETRAINED
         assert type(cfg.OPTIM[0]) == str
         assert type(cfg.OPTIM[1]) == EasyDict
 
-    @pytest.mark.training
+    @pytest.mark.train
     def test_load_CC_train(self):
         model = load_CC_train()
         assert type(model) == CrowdCounter

@@ -8,7 +8,7 @@ import pytest
 import json
 
 
-@pytest.mark.testing
+@pytest.mark.evaluate
 def test_metric_saver():
     metric_file = NamedTemporaryFile()
     metric_file.close()
@@ -25,17 +25,17 @@ class TestPreliminarTest:
         self.eval_params, self.global_params = eval.load_yaml_eval_params()
         eval.initialize_eval_params(self.eval_params, self.global_params)
 
-    @pytest.mark.testing
+    @pytest.mark.evaluate
     def test_param_load(self):
         assert issubclass(type(self.eval_params), dict)
         assert issubclass(type(self.global_params), dict)
 
-    @pytest.mark.testing
+    @pytest.mark.evaluate
     def test_initialize_eval_params(self):
         assert cfg.GPU
         assert cfg_data.DATA_PATH
 
-    @pytest.mark.testing
+    @pytest.mark.evaluate
     def test_load_CC_test(self):
         cfg.PRE_TRAINED = None
         model = eval.load_CC_test()
