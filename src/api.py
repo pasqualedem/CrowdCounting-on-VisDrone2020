@@ -12,6 +12,7 @@ import uuid
 
 from fastapi import FastAPI, UploadFile, File, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.background import BackgroundTasks
 from http import HTTPStatus
 from run import run_net, load_CC_run
@@ -42,6 +43,20 @@ app = FastAPI(
     description=description,
     version="1.0.0",
 )
+
+origins = [
+    "http://localhost:4200",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    expose_headers=["*"],
+    allow_headers=origins
+)
+
 model = None
 img_queue = []
 count_queue = []
