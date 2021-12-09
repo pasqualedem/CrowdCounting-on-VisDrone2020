@@ -21,7 +21,7 @@ from dataset.stochastic import RandomDataset
 def load_CC(MC):
     cc = CrowdCounter([0], MC)
     if cfg.PRE_TRAINED:
-        cc.load(cfg.PRE_TRAINED)
+        cc.load(cfg.PRE_TRAINED, 'cuda')
     return cc
 
 
@@ -94,14 +94,14 @@ def benchmark_forward(model, x, num_runs, num_warmup_runs):
     """
     print('\nStarting warmup')
     # DRY RUNS
-    for i in tqdm(range(num_warmup_runs)):
+    for _ in tqdm(range(num_warmup_runs)):
         _ = measure_forward(model, x)
 
     print('\nDone, now benchmarking')
 
     # START BENCHMARKING
     t_forward = []
-    for x in tqdm(num_runs):
+    for _ in tqdm(range(num_runs)):
         t_fp = measure_forward(model, x)
         t_forward.append(t_fp)
 
@@ -181,7 +181,8 @@ class Benchmarker:
             data_loader = torch.utils.data.DataLoader(
                 self.dataset, batch_size=bs, shuffle=False, num_workers=self.n_workers
             )
-            tmp = benchmark_forward(model, num_runs, num_warmup_runs, data_loader)
+            x = next(iter(data_loader))
+            tmp = benchmark_forward(self.model,  x, num_runs, num_warmup_runs)
             # NOTE: we are estimating inference time per image
             mean_tfp.append(np.asarray(tmp).mean() / bs * 1e3)
             std_tfp.append(np.asarray(tmp).std() / bs * 1e3)
@@ -207,7 +208,7 @@ class Benchmarker:
             data_loader = torch.utils.data.DataLoader(
                 self.dataset, batch_size=bs, shuffle=False, num_workers=self.n_workers
             )
-            tmp = benchmark_fps(model, data_loader, num_runs, num_warmup_runs)
+            tmp = benchmark_fps(self.model, data_loader, num_runs, num_warmup_runs)
             mean_fps.append((1 / (np.asarray(tmp) / len(self.dataset))).mean())
             std_fps.append((1 / (np.asarray(tmp) / len(self.dataset))).std())
 

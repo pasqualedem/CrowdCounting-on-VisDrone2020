@@ -24,7 +24,7 @@ def run_model(model, dataset, batch_size, n_workers, callbacks):
     info_print('Running using device: ' + str(device))
 
     # Setup the data loader
-    if type(dataset) == VideoDataset:
+    if len(dataset) == 1:
         n_workers = 0
     data_loader = torch.utils.data.DataLoader(
         dataset, batch_size=batch_size, shuffle=False, num_workers=n_workers

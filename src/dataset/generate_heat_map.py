@@ -11,7 +11,6 @@ from pathlib import Path
 from ruamel.yaml import YAML
 
 
-
 def generate_heatmap(df, img_size, wished_heatmap_size, gamma):
     """
     Generate a dictionary of heatmaps
@@ -110,6 +109,18 @@ def dataframe_load_train(filename):
     return df
 
 
+def load_yaml_prepare_params():
+    # Path of the parameters file
+    params_path = Path("params.yaml")
+    # Read data preparation parameters
+    with open(params_path, "r") as params_file:
+        yaml = YAML()
+        params = yaml.load(params_file)
+        prepare_params = params["prepare"]
+        global_params = params["global"]
+    return prepare_params, global_params
+
+
 if __name__ == '__main__':
     train_rule = lambda x: '.txt' in x and 'test' not in x
     test_rule = lambda x: '_test.txt' in x
@@ -117,17 +128,7 @@ if __name__ == '__main__':
     img_train_rule = lambda x, y: os.path.join(x, y)
     img_test_rule = lambda x, y: os.path.join(x, re.sub('\_test$', '', y))
 
-    # Path of the parameters file
-    params_path = Path("params.yaml")
-    
-    # Read data preparation parameters
-    with open(params_path, "r") as params_file:
-        yaml = YAML()
-        params = yaml.load(params_file)
-        prepare_params = params["prepare"]
-        global_params = params["global"]
-
-
+    prepare_params, global_params = load_yaml_prepare_params()
     size = global_params["SIZE"]
 
     train = [train_rule, img_train_rule, dataframe_load_train, size]

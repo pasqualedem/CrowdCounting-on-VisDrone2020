@@ -9,8 +9,8 @@ __C.SEED = 3035  # random seed
 # System settings
 __C.TRAIN_BATCH_SIZE = 4
 __C.VAL_BATCH_SIZE = 6
-__C.TEST_BATCH_SIZE = 6
-__C.N_WORKERS = 2
+__C.TEST_BATCH_SIZE = 12
+__C.N_WORKERS = 4
 __C.SIZE = [540, 960]
 
 __C.LOSSES = ['RMSE', 'MSE']

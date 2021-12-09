@@ -27,8 +27,9 @@ def load_CC_test():
     """
     cc = CrowdCounter([0], cfg.NET)
     if cfg.PRE_TRAINED:
-        cc.load(cfg.PRE_TRAINED)
+        cc.load(cfg.PRE_TRAINED, cfg.GPU)
     return cc
+
 
 def test_model(
         model,
@@ -128,30 +129,36 @@ def metrics_saver(path, metrics):
         json.dump(metrics, fp)
 
 
-if __name__ == '__main__':
-
+def load_yaml_eval_params():
     params_path = Path("params.yaml")
-    Path(EVAL_FOLDER).mkdir(exist_ok=True)
+
     with open(params_path, 'r') as params_file:
         yaml = YAML()
         params = yaml.load(params_file)
 
-        eval_params = params['evaluate']
-        global_params = params['global']
-        cfg.NET, cfg.GPU = eval_params['model']['NET'], eval_params['model']['GPU']
-        cfg.PRE_TRAINED = eval_params['model']['PRETRAINED']
-        cfg.N_WORKERS = eval_params['N_WORKERS']
-        cfg.TEST_BATCH_SIZE = eval_params['BATCH_SIZE']
-        cfg.DEVICE = eval_params['DEVICE']
-        cfg.OUT_PREDICTIONS = eval_params['OUT_PREDICTIONS']
-        cfg.LOSSES = eval_params['LOSSES']
-        cfg_data.DATA_PATH = global_params['DATA_PATH']
-        cfg_data.SIZE = global_params['SIZE']
+    eval_params = params['evaluate']
+    global_params = params['global']
+    return eval_params, global_params
 
-        actual_losses = cfg.LOSSES
 
-        losses = {loss: losses_dict[loss] for loss in actual_losses}
+def initialize_eval_params(eval_params, global_params):
+    cfg.NET, cfg.GPU = eval_params['model']['NET'], eval_params['model']['GPU']
+    cfg.PRE_TRAINED = eval_params['model']['PRETRAINED']
+    cfg.N_WORKERS = eval_params['N_WORKERS']
+    cfg.TEST_BATCH_SIZE = eval_params['BATCH_SIZE']
+    cfg.DEVICE = eval_params['DEVICE']
+    cfg.OUT_PREDICTIONS = eval_params['OUT_PREDICTIONS']
+    cfg.LOSSES = eval_params['LOSSES']
+    cfg_data.DATA_PATH = global_params['DATA_PATH']
+    cfg_data.SIZE = global_params['SIZE']
 
-        metrics = evaluate_model(load_CC_test, load_test, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, losses, cfg.DEVICE, cfg.OUT_PREDICTIONS)
 
-        metrics_saver("metrics.json", metrics)
+if __name__ == '__main__':
+    Path(EVAL_FOLDER).mkdir(exist_ok=True)
+    eval_params, global_params = load_yaml_eval_params()
+    initialize_eval_params(eval_params, global_params)
+    actual_losses = cfg.LOSSES
+
+    losses = {loss: losses_dict[loss] for loss in actual_losses}
+    metrics = evaluate_model(load_CC_test, load_test, cfg.TEST_BATCH_SIZE, cfg.N_WORKERS, losses, cfg.DEVICE, cfg.OUT_PREDICTIONS)
+    metrics_saver("metrics.json", metrics)

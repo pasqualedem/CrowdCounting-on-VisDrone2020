@@ -42,12 +42,12 @@ stages:
     cmd: python src/dataset/generate_heat_map.py
     deps:
     - path: dataset/VisDrone2020-CC/raw
-      md5: 173410955693b84a33d3df753adce4b7.dir
-      size: 1148990226
-      nfiles: 3474
+      md5: 9737366fa86893699d5dfd518b8523dd.dir
+      size: 1195186431
+      nfiles: 3476
     - path: src/dataset/generate_heat_map.py
-      md5: 6a4f9edb75ba1b9d056cef35d3ea12ad
-      size: 5554
+      md5: bef9ae01688319349681888f4e5d5dc4
+      size: 5685
     params:
       params.yaml:
         global.DATA_PATH: dataset/VisDrone2020-CC
