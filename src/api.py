@@ -290,7 +290,7 @@ def make_video(tmp, filename, tmp_filename, tmp_heats):
     cap.release()
 
     # generate a video from the heatmaps obtained from each frame
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    fourcc = cv2.VideoWriter_fourcc(*'H264')
     video_writer = cv2.VideoWriter(file_path, fourcc, fps, (width, height))
     for frame in frames:
         video_writer.write(cv2.imread(frame))
