@@ -49,6 +49,7 @@ app = FastAPI(
 
 origins = [
     "http://localhost:4200",
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
@@ -93,7 +94,7 @@ def _load_model():
 
 
 @app.on_event("startup")
-def _load_instrumentator():
+async def _load_instrumentator():
     """
     Loads the instrumentator
     """
