@@ -21,7 +21,7 @@ from dataset.visdrone import cfg_data
 from pathlib import Path
 from utils import info_print
 
-from monitoring import instrumentator
+from monitoring import initialize_instrumentator
 
 description = """Drone-CrowdCounting API allows you to deal with crowd air view pictures shot with drones
 
@@ -46,7 +46,6 @@ app = FastAPI(
     version="1.0.0",
 )
 
-instrumentator.instrument(app).expose(app, include_in_schema=False, should_gzip=True)
 
 origins = [
     "http://localhost:4200",
@@ -91,6 +90,17 @@ def _load_model():
     model.eval()
 
     info_print('Model correctly loaded on: ' + str(next(model.parameters()).device))
+
+
+@app.on_event("startup")
+def _load_instrumentator():
+    """
+    Loads the instrumentator
+    """
+    instrumentator = initialize_instrumentator()
+    instrumentator.instrument(app).expose(app, include_in_schema=False, should_gzip=True)
+
+    info_print('Instrumentator correctly initialized')
 
 
 @app.on_event("shutdown")
