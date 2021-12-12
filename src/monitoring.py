@@ -6,16 +6,16 @@ from prometheus_client import Histogram
 from prometheus_fastapi_instrumentator import Instrumentator, metrics
 from prometheus_fastapi_instrumentator.metrics import Info
 
-NAMESPACE = os.environ.get("METRICS_NAMESPACE", "fastapi")
+NAMESPACE = os.environ.get("METRICS_NAMESPACE", "visdrone")
 SUBSYSTEM = os.environ.get("METRICS_SUBSYSTEM", "model")
 
 
 # ----- custom metrics -----
 def count_output(
-        metric_name: str = "count_output",
+        metric_name: str = "people_count",
         metric_doc: str = "People count",
-        metric_namespace: str = "",
-        metric_subsystem: str = "",
+        metric_namespace: str = NAMESPACE,
+        metric_subsystem: str = SUBSYSTEM,
         buckets=(0, 30, 60, 90, 120, 150, 180, 210, 240, 250, float("inf")),
 ) -> Callable[[Info], None]:
     METRIC = Histogram(
