@@ -21,6 +21,8 @@ from dataset.visdrone import cfg_data
 from pathlib import Path
 from utils import info_print
 
+from monitoring import instrumentator
+
 description = """Drone-CrowdCounting API allows you to deal with crowd air view pictures shot with drones
 
 ## Users
@@ -43,6 +45,8 @@ app = FastAPI(
     description=description,
     version="1.0.0",
 )
+
+instrumentator.instrument(app).expose(app, include_in_schema=False, should_gzip=True)
 
 origins = [
     "http://localhost:4200",
