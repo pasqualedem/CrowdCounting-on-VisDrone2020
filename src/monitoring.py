@@ -5,10 +5,12 @@ import numpy as np
 from prometheus_client import Histogram
 from prometheus_fastapi_instrumentator import Instrumentator, metrics
 from prometheus_fastapi_instrumentator.metrics import Info
+from starlette.responses import JSONResponse
 
 NAMESPACE = os.environ.get("METRICS_NAMESPACE", "visdrone")
 SUBSYSTEM = os.environ.get("METRICS_SUBSYSTEM", "model")
 
+COUNT_BUCKETS = (30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 250.0, float("inf"))
 
 # ----- custom metrics -----
 def count_output(
@@ -16,7 +18,7 @@ def count_output(
         metric_doc: str = "People count",
         metric_namespace: str = NAMESPACE,
         metric_subsystem: str = SUBSYSTEM,
-        buckets=(0, 30, 60, 90, 120, 150, 180, 210, 240, 250, float("inf")),
+        buckets=COUNT_BUCKETS,
 ) -> Callable[[Info], None]:
     METRIC = Histogram(
         metric_name,
@@ -27,13 +29,10 @@ def count_output(
     )
 
     def instrumentation(info: Info) -> None:
-        if info.modified_handler == "/predictions/images?count=true&heatmap=true":
+        if info.modified_handler == '/predictions/images':
             counting = info.response.headers['count']
             if counting:
-                METRIC.observe(float(counting))
-        elif info.modified_handler == "/predictions/images?count=true&heatmap=false":
-            counting = info.response.body.json()['count']
-            if counting:
+                print('Conteggio header' + str(counting))
                 METRIC.observe(float(counting))
 
     return instrumentation
@@ -87,7 +86,7 @@ def initialize_instrumentator():
         )
     )
 
-    buckets = (*np.arange(0, 10.5, 0.5).tolist(), float("inf"))
+    buckets = COUNT_BUCKETS
     instrumentator.add(
         count_output(metric_namespace=NAMESPACE, metric_subsystem=SUBSYSTEM, buckets=buckets)
     )

@@ -160,7 +160,8 @@ async def predictFromImages(file: UploadFile = File(...), count: bool = True, he
     name = file.filename
     if count and not heatmap:
         run_net(img, [count_queue_callback], model)
-        return {'img_name': str(name), 'count': count_queue.pop(0)}
+        result = {'img_name': str(name), 'count': count_queue.pop(0)}
+        return JSONResponse(result, headers=result)
 
     if heatmap and not count:
         run_net(img, [img_queue_callback], model)
