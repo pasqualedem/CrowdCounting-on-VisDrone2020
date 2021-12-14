@@ -20,6 +20,10 @@ METRICS = [
 
 # ----- custom metrics -----
 def count_output() -> Callable[[Info], None]:
+    """
+    Used to create count_output custom metric.
+    count_output returns an histogram of the prediction counting result
+    """
     METRIC = Histogram(
         name="people_count",
         documentation="People count",
@@ -44,6 +48,9 @@ CUSTOM_METRICS = [
 
 
 def initialize_instrumentator():
+    """
+    Create and initialize instrumentator by adding all the metrics given in METRICS and CUSTOM METRICS
+    """
     instrumentator = Instrumentator(
         should_group_status_codes=True,
         should_ignore_untemplated=True,
