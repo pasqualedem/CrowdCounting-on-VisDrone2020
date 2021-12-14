@@ -73,7 +73,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f2ogz_27z"
+            "uid": "promdts1"
           },
           "exemplar": true,
           "expr": "visdrone_model_http_request_duration_seconds_bucket{handler=\"/predictions/images\", status=\"2xx\"}",
@@ -136,7 +136,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f2ogz_27z"
+            "uid": "promdts1"
           },
           "exemplar": true,
           "expr": "visdrone_model_http_request_duration_seconds_bucket{handler=\"/predictions/videos\", status=\"2xx\"}",
@@ -198,7 +198,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f2ogz_27z"
+            "uid": "promdts1"
           },
           "exemplar": true,
           "expr": "visdrone_model_people_count_bucket",
