@@ -1,16 +1,21 @@
 import os
 from typing import Callable
 
-import numpy as np
 from prometheus_client import Histogram
 from prometheus_fastapi_instrumentator import Instrumentator, metrics
 from prometheus_fastapi_instrumentator.metrics import Info
-from starlette.responses import JSONResponse
 
 NAMESPACE = os.environ.get("METRICS_NAMESPACE", "visdrone")
 SUBSYSTEM = os.environ.get("METRICS_SUBSYSTEM", "model")
 
 COUNT_BUCKETS = (30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 250.0, float("inf"))
+
+METRICS = [
+    metrics.request_size,
+    metrics.response_size,
+    metrics.latency,
+    metrics.requests,
+]
 
 # ----- custom metrics -----
 def count_output(
@@ -49,42 +54,16 @@ def initialize_instrumentator():
     )
 
     # ----- add metrics -----
-    instrumentator.add(
-        metrics.request_size(
-            should_include_handler=True,
-            should_include_method=True,
-            should_include_status=True,
-            metric_namespace=NAMESPACE,
-            metric_subsystem=SUBSYSTEM,
+    for metric in METRICS:
+        instrumentator.add(
+            metric(
+                should_include_handler=True,
+                should_include_method=True,
+                should_include_status=True,
+                metric_namespace=NAMESPACE,
+                metric_subsystem=SUBSYSTEM,
+            )
         )
-    )
-    instrumentator.add(
-        metrics.response_size(
-            should_include_handler=True,
-            should_include_method=True,
-            should_include_status=True,
-            metric_namespace=NAMESPACE,
-            metric_subsystem=SUBSYSTEM,
-        )
-    )
-    instrumentator.add(
-        metrics.latency(
-            should_include_handler=True,
-            should_include_method=True,
-            should_include_status=True,
-            metric_namespace=NAMESPACE,
-            metric_subsystem=SUBSYSTEM,
-        )
-    )
-    instrumentator.add(
-        metrics.requests(
-            should_include_handler=True,
-            should_include_method=True,
-            should_include_status=True,
-            metric_namespace=NAMESPACE,
-            metric_subsystem=SUBSYSTEM,
-        )
-    )
 
     buckets = COUNT_BUCKETS
     instrumentator.add(
