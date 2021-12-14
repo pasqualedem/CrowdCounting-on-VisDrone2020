@@ -68,7 +68,7 @@ count_queue = []
 
 def img_queue_callback(input, prediction, name):
     """
-
+    Adds prediction heatmap to img_queue queue
     """
     prediction = prediction.to('cpu')
     img_queue.append(prediction)
@@ -76,7 +76,7 @@ def img_queue_callback(input, prediction, name):
 
 def count_queue_callback(input, prediction, name):
     """
-
+    Adds prediction count to count_queue queue
     """
     count_queue.append(str(np.round(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA)))
 
