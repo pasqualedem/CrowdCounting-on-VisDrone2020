@@ -17,20 +17,15 @@ METRICS = [
     metrics.requests,
 ]
 
+
 # ----- custom metrics -----
-def count_output(
-        metric_name: str = "people_count",
-        metric_doc: str = "People count",
-        metric_namespace: str = NAMESPACE,
-        metric_subsystem: str = SUBSYSTEM,
-        buckets=COUNT_BUCKETS,
-) -> Callable[[Info], None]:
+def count_output() -> Callable[[Info], None]:
     METRIC = Histogram(
-        metric_name,
-        metric_doc,
-        buckets=buckets,
-        namespace=metric_namespace,
-        subsystem=metric_subsystem,
+        name="people_count",
+        documentation="People count",
+        buckets=COUNT_BUCKETS,
+        namespace=NAMESPACE,
+        subsystem=SUBSYSTEM,
     )
 
     def instrumentation(info: Info) -> None:
@@ -41,6 +36,11 @@ def count_output(
                 METRIC.observe(float(counting))
 
     return instrumentation
+
+
+CUSTOM_METRICS = [
+    count_output
+]
 
 
 def initialize_instrumentator():
@@ -65,8 +65,6 @@ def initialize_instrumentator():
             )
         )
 
-    buckets = COUNT_BUCKETS
-    instrumentator.add(
-        count_output(metric_namespace=NAMESPACE, metric_subsystem=SUBSYSTEM, buckets=buckets)
-    )
+    for metric in CUSTOM_METRICS:
+        instrumentator.add(metric())
     return instrumentator
