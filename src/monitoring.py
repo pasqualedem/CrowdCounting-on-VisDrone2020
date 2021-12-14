@@ -1,7 +1,7 @@
 import os
 from typing import Callable
 
-from prometheus_client import Histogram
+from prometheus_client import Histogram, Counter
 from prometheus_fastapi_instrumentator import Instrumentator, metrics
 from prometheus_fastapi_instrumentator.metrics import Info
 
@@ -36,14 +36,32 @@ def count_output() -> Callable[[Info], None]:
         if info.modified_handler == '/predictions/images':
             counting = info.response.headers['count']
             if counting:
-                print('Conteggio header' + str(counting))
                 METRIC.observe(float(counting))
 
     return instrumentation
 
 
+def query_parameter_count() -> Callable[[Info], None]:
+    counts = Counter('query_parameter_count', 'counts the various query parameters',
+             ['query_count'],
+             namespace=NAMESPACE,
+             subsystem=SUBSYSTEM,
+             )
+
+    def instrumentation(info: Info) -> None:
+        if info.request.query_params:
+            if info.request.query_params.get('count') =='true' and info.request.query_params.get('heatmap') =='false':
+                counts.labels('count').inc()
+            if info.request.query_params.get('heatmap') =='true' and info.request.query_params.get('count') =='false':
+                counts.labels('heatmap').inc()
+            if info.request.query_params.get('heatmap') == 'true' and info.request.query_params.get('count') == 'true':
+                counts.labels('both').inc()
+
+    return instrumentation
+
 CUSTOM_METRICS = [
-    count_output
+    count_output,
+    query_parameter_count
 ]
 
 
@@ -75,3 +93,4 @@ def initialize_instrumentator():
     for metric in CUSTOM_METRICS:
         instrumentator.add(metric())
     return instrumentator
+
