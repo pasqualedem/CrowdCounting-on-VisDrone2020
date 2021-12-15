@@ -28,30 +28,25 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "continuous-RdYlGr"
           },
           "custom": {
-            "fillOpacity": 100,
-            "lineWidth": 0
+            "fillOpacity": 55,
+            "lineWidth": 4
           },
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 0
-              },
-              {
-                "color": "green",
-                "value": 1
               }
             ]
-          }
+          },
+          "unit": "bool_on_off"
         },
         "overrides": []
       },
@@ -61,17 +56,18 @@
         "x": 0,
         "y": 0
       },
-      "id": 7,
+      "id": 18,
       "options": {
-        "colWidth": 1,
+        "alignValue": "left",
         "legend": {
           "displayMode": "hidden",
           "placement": "bottom"
         },
-        "rowHeight": 0,
-        "showValue": "never",
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
         "tooltip": {
-          "mode": "none"
+          "mode": "single"
         }
       },
       "pluginVersion": "8.3.2",
@@ -81,18 +77,18 @@
             "type": "prometheus",
             "uid": "promdts1"
           },
-          "exemplar": true,
+          "exemplar": false,
           "expr": "up{job=\"drone\"}",
           "format": "time_series",
           "instant": false,
           "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "{{job}}",
+          "legendFormat": " ",
           "refId": "A"
         }
       ],
       "title": "Health check",
-      "type": "status-history"
+      "type": "state-timeline"
     },
     {
       "fieldConfig": {
@@ -146,36 +142,43 @@
           "refId": "A"
         }
       ],
-      "title": "Status count",
+      "title": "Request Status count",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "valueLabel": "status"
+          }
+        }
+      ],
       "type": "bargauge"
     },
     {
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "continuous-RdYlGr"
+            "mode": "continuous-BlPu"
           },
           "custom": {
-            "axisGridShow": true,
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "hue",
+            "fillOpacity": 80,
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 6,
+            "lineInterpolation": "smooth",
+            "lineWidth": 4,
+            "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
-            "spanNulls": false,
+            "showPoints": "never",
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -197,7 +200,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "short"
         },
         "overrides": []
       },
@@ -207,11 +211,11 @@
         "x": 16,
         "y": 0
       },
-      "id": 9,
+      "id": 21,
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "list",
+          "displayMode": "hidden",
           "placement": "bottom"
         },
         "tooltip": {
@@ -295,7 +299,7 @@
             "type": "prometheus",
             "uid": "promdts1"
           },
-          "exemplar": true,
+          "exemplar": false,
           "expr": "visdrone_model_http_request_duration_seconds_bucket{handler=\"/predictions/images\", status=\"2xx\"}",
           "format": "heatmap",
           "instant": false,
@@ -384,7 +388,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "none"
         },
         "overrides": []
       },
@@ -414,8 +419,8 @@
             "type": "prometheus",
             "uid": "promdts1"
           },
-          "exemplar": true,
-          "expr": "visdrone_model_http_request_duration_seconds_bucket{handler=\"/predictions/videos\", status=\"2xx\"}",
+          "exemplar": false,
+          "expr": "visdrone_model_video_time_bucket{handler=\"/predictions/videos\", status=\"2xx\"}",
           "format": "heatmap",
           "instant": false,
           "interval": "",
@@ -487,7 +492,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "continuous-BlYlRd"
           },
           "mappings": [],
           "thresholds": {
@@ -508,7 +513,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 9,
         "x": 0,
         "y": 16
       },
@@ -532,7 +537,7 @@
             "type": "prometheus",
             "uid": "promdts1"
           },
-          "exemplar": true,
+          "exemplar": false,
           "expr": "visdrone_model_people_count_bucket",
           "format": "heatmap",
           "interval": "",
@@ -562,17 +567,21 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
+        "w": 3,
+        "x": 9,
         "y": 16
       },
       "id": 15,
       "options": {
+        "displayLabels": [
+          "name",
+          "value"
+        ],
         "legend": {
-          "displayMode": "list",
+          "displayMode": "hidden",
           "placement": "bottom"
         },
-        "pieType": "pie",
+        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -598,7 +607,99 @@
         }
       ],
       "title": "Query Counting",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "keepLabels": [
+              "query_count"
+            ],
+            "valueLabel": "query_count"
+          }
+        }
+      ],
       "type": "piechart"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-BlYlRd"
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "id": 23,
+      "options": {
+        "bucketOffset": 0,
+        "combine": false,
+        "legend": {
+          "calcs": [],
+          "displayMode": "hidden",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "promdts1"
+          },
+          "exemplar": true,
+          "expr": "rate(visdrone_model_http_request_size_bytes_count{status=\"2xx\", handler=~\"/predictions/images|/predictions/videos\"}[5m])",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Request size",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "{handler=\"/predictions/images\", instance=\"host.docker.internal:8000\", job=\"drone\", method=\"POST\", status=\"2xx\"}",
+                "{handler=\"/predictions/videos\", instance=\"host.docker.internal:8000\", job=\"drone\", method=\"POST\", status=\"2xx\"}"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": true
+          }
+        }
+      ],
+      "type": "histogram"
     }
   ],
   "refresh": false,
@@ -609,7 +710,7 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},
