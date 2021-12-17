@@ -21,6 +21,8 @@ from dataset.visdrone import cfg_data
 from pathlib import Path
 from utils import info_print
 
+from monitoring import initialize_instrumentator
+
 description = """Drone-CrowdCounting API allows you to deal with crowd air view pictures shot with drones
 
 ## Users
@@ -44,8 +46,10 @@ app = FastAPI(
     version="1.0.0",
 )
 
+
 origins = [
     "http://localhost:4200",
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
@@ -64,7 +68,7 @@ count_queue = []
 
 def img_queue_callback(input, prediction, name):
     """
-
+    Adds prediction heatmap to img_queue queue
     """
     prediction = prediction.to('cpu')
     img_queue.append(prediction)
@@ -72,7 +76,7 @@ def img_queue_callback(input, prediction, name):
 
 def count_queue_callback(input, prediction, name):
     """
-
+    Adds prediction count to count_queue queue
     """
     count_queue.append(str(np.round(torch.sum(prediction.squeeze()).item() / cfg_data.LOG_PARA)))
 
@@ -87,6 +91,17 @@ def _load_model():
     model.eval()
 
     info_print('Model correctly loaded on: ' + str(next(model.parameters()).device))
+
+
+@app.on_event("startup")
+async def _load_instrumentator():
+    """
+    Loads the instrumentator
+    """
+    instrumentator = initialize_instrumentator()
+    instrumentator.instrument(app).expose(app, include_in_schema=False, should_gzip=True)
+
+    info_print('Instrumentator correctly initialized')
 
 
 @app.on_event("shutdown")
@@ -145,7 +160,8 @@ async def predictFromImages(file: UploadFile = File(...), count: bool = True, he
     name = file.filename
     if count and not heatmap:
         run_net(img, [count_queue_callback], model)
-        return {'img_name': str(name), 'count': count_queue.pop(0)}
+        result = {'img_name': str(name), 'count': count_queue.pop(0)}
+        return JSONResponse(result, headers=result)
 
     if heatmap and not count:
         run_net(img, [img_queue_callback], model)
