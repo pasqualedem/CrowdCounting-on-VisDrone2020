@@ -29,7 +29,7 @@ jobs:
       env:
           GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS }}
       run: |
-        dvc pull exp/model.pt
+        dvc pull exp/model.pth
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
