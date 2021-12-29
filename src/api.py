@@ -50,7 +50,7 @@ app = FastAPI(
 origins = [
     "http://localhost:4200",
     "http://localhost:3000",
-    "http://drone-crowdcounting.azurewebsites.net"
+    "http://drone-crowdcounting.azurewebsites.net:3000"
 ]
 
 app.add_middleware(
