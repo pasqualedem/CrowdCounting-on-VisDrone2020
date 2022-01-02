@@ -1,4 +1,4 @@
-# Drone-CrowdCounting [![codecov](https://codecov.io/gh/se4ai2122-cs-uniba/Drone-CrowdCounting/branch/main/graph/badge.svg?token=WFM4DH44WF)](https://codecov.io/gh/se4ai2122-cs-uniba/Drone-CrowdCounting) ![Pylint Report](https://github.com/se4ai2122-cs-uniba/Drone-CrowdCounting/actions/workflows/linting.yml/badge.svg)
+# Drone-CrowdCounting [![codecov](https://codecov.io/gh/se4ai2122-cs-uniba/Drone-CrowdCounting/branch/main/graph/badge.svg?token=WFM4DH44WF)](https://codecov.io/gh/se4ai2122-cs-uniba/Drone-CrowdCounting) ![Pylint Report](https://github.com/se4ai2122-cs-uniba/Drone-CrowdCounting/actions/workflows/lint.yml/badge.svg)
 
 *Counting people in drone images.*
 
@@ -73,19 +73,17 @@ locust -f tests/locust.py --host http://localhost:8000
 To run pytest without gpu:
 
 ```bash
-PYTHONPATH=src pytest -m "not gpu" --cov src/covidx tests/
+PYTHONPATH=src pytest -m "not gpu" --cov src tests/
 ```
 
 To run pytest with gpu:
 ```bash
-PYTHONPATH=src pytest --cov src/covidx tests/
+PYTHONPATH=src pytest --cov src tests/
 ```
 
 ## Great Expectations
 ```bash
-cd tests
-for checkpoint in ct-train ct-valid ct-test
-do
-  great_expectations --v3-api checkpoint run $checkpoint
+cd tests/great_expectations/checkpoints
+great_expectations --v3-api checkpoint run complete_data.yml
 done
 ```
