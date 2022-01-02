@@ -1,0 +1,38 @@
+name: Testing
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      OS: ubuntu-latest
+      PYTHON: '3.9'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+          fetch-depth: 0
+    
+    - name: Setup Python
+      uses: actions/setup-python@v2.3.1
+      with:
+        python-version: 3.9
+    - name: Install dependecies
+      run: |
+        pip install -r requirements.txt
+        pip install dvc[gdrive]
+    - name: DVC pull
+      env:
+          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS }}
+      run: |
+        dvc pull
+    - name: Generate Report
+      run: |
+        pip install pytest pytest-cov 
+        PYTHONPATH='src' pytest --cov src tests/ -m "not (cuda or video or h5)" --cov-report=xml
+    - name: Codecov
+      uses: codecov/codecov-action@v2.1.0

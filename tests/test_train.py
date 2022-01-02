@@ -60,7 +60,8 @@ class TestPreliminarTrain:
         assert cfg.PRETRAINED
         assert type(cfg.OPTIM[0]) == str
         assert type(cfg.OPTIM[1]) == EasyDict
-
+        
+    @pytest.mark.cuda
     @pytest.mark.train
     def test_load_CC_train(self):
         model = load_CC_train()

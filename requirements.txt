@@ -31,6 +31,7 @@ orjson==3.6.4
 pandas==1.2.5
 Pillow==8.2.0
 priority==2.0.0
+prometheus-fastapi-instrumentator==5.7.1
 protobuf==3.19.1
 pydantic==1.8.2
 pyparsing==3.0.4

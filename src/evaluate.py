@@ -25,7 +25,14 @@ def load_CC_test():
     """
     Load CrowdCounter model net for testing mode
     """
-    cc = CrowdCounter([0], cfg.NET)
+
+    if cfg.DEVICE == 'cuda' and torch.cuda.is_available():
+        device = [0]
+    else:
+        device = 'cpu'
+        cfg.DEVICE = 'cpu'
+
+    cc = CrowdCounter(device, cfg.NET)
     if cfg.PRE_TRAINED:
         cc.load(cfg.PRE_TRAINED, cfg.GPU)
     return cc

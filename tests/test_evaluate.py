@@ -59,6 +59,7 @@ class TestPreliminarTest:
 
     @pytest.mark.evaluate
     @pytest.mark.slow
+    @pytest.mark.h5
     def test_evaluate(self):
         losses = {'mae': mean_absolute_error}
         cfg.PRE_TRAINED = None
