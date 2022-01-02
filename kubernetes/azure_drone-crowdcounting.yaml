@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drone-crowdcounting
+  labels:
+    app: drone-crowdcounting
+spec:
+  selector:
+    matchLabels:
+      app: drone-crowdcounting
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: drone-crowdcounting
+    spec:
+      containers:
+        - name: drone-crowdcounting
+          image: visdrone.azurecr.io/visdrone
+          imagePullPolicy: IfNotPresent
+          ports: 
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: 2Gi
+              cpu: "0.25"
+            limits:
+              #nvidia.com/gpu: 1
+              memory: 4Gi
+              cpu: "0.75"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: drone-crowdcounting-service
+  labels:
+    app: drone-crowdcounting
+spec:
+  selector:
+    app: drone-crowdcounting
+  type: LoadBalancer
+  ports:
+    - port: 80
+      #nodePort: 30000
+      targetPort: 8000
