@@ -1,4 +1,4 @@
-# Drone-CrowdCounting [![codecov](https://codecov.io/gh/se4ai2122-cs-uniba/Drone-CrowdCounting/branch/main/graph/badge.svg?token=WFM4DH44WF)](https://codecov.io/gh/se4ai2122-cs-uniba/Drone-CrowdCounting) ![Pylint Report](https://github.com/se4ai2122-cs-uniba/Drone-CrowdCounting/actions/workflows/lint.yml/badge.svg)
+# Drone-CrowdCounting [![codecov](https://codecov.io/gh/se4ai2122-cs-uniba/Drone-CrowdCounting/branch/main/graph/badge.svg?token=WFM4DH44WF)](https://codecov.io/gh/se4ai2122-cs-uniba/Drone-CrowdCounting) ![Pylint Report](https://github.com/se4ai2122-cs-uniba/Drone-CrowdCounting/actions/workflows/linting.yml/badge.svg)
 
 *Counting people in drone images.*
 
