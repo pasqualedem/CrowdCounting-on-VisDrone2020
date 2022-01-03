@@ -52,7 +52,13 @@ origins = [
     "http://localhost:3000",
     "http://drone-crowdcounting.azurewebsites.net",
     "http://drone-crowdcounting.azurewebsites.net:3000",
-    "http://drone-crowdcounting.azurewebsites.net:4200"
+    "http://drone-crowdcounting.azurewebsites.net:4200",
+    "http://drone-crowdcounting.com",
+    "http://drone-crowdcounting.com:3000",
+    "http://drone-crowdcounting.com:4200",
+    "http://www.drone-crowdcounting.com",
+    "http://www.drone-crowdcounting.com:3000",
+    "http://www.drone-crowdcounting.com:4200"
 ]
 
 app.add_middleware(
