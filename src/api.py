@@ -301,26 +301,18 @@ def save_video(file, folder):
 
 
 def make_video(tmp, filename, tmp_filename, tmp_heats):
-    file_name = Path(tmp_filename).stem + '_heatmap{}'.format(os.path.splitext(filename)[1])
+    file_name = Path(tmp_filename).stem + '_heatmap.mp4'
     file_path = os.path.join(tmp, file_name)
     cap = cv2.VideoCapture(tmp_filename)
-
-    # generate file list for heatmaps
-    frames = os.listdir(tmp_heats)
-    frames.sort(key=lambda fname: int(fname.split('.')[0]))
-    frames = [os.path.join(tmp_heats, frame) for frame in frames]
+    n_digits = len(str(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))))
     fps = cap.get(cv2.CAP_PROP_FPS)
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     cap.release()
 
     # generate a video from the heatmaps obtained from each frame
-    fourcc = cv2.VideoWriter_fourcc(*'H264')
-    video_writer = cv2.VideoWriter(file_path, fourcc, fps, (width, height))
-    for frame in frames:
-        video_writer.write(cv2.imread(frame))
-    # cv2.destroyAllWindows()
-    video_writer.release()
+    command = "ffmpeg -i {}/%0{}d.png -c:v libx264 -vf fps={} -pix_fmt yuv420p {}" \
+              .format(tmp_heats,n_digits, fps, file_path)
+    info_print(command)
+    os.system(command)
     return file_path, file_name
 
 
