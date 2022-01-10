@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - ./alertmanager/alert.rules.yml:/etc/prometheus/alert.rules.yml
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+
+#  node-exporter:
+#    restart: always
+#    depends_on:
+#      - prometheus
+#    image: prom/node-exporter
+#    container_name: node-exporter
+#    volumes:
+#      - /proc:/host/proc:ro
+#      - /sys:/host/sys:ro
+#      - /:/rootfs:ro
+#    command:
+#      - '--path.procfs=/host/proc'
+#      - '--path.rootfs=/rootfs'
+#      - '--path.sysfs=/host/sys'
+#      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+#    ports:
+#      - 9100:9100
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana-enterprise
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    volumes:
+      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/local.yml
+      - ./grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/local.yml
+      - ./grafana/dashboard.json:/var/lib/grafana/dashboards/visdrone.json
+      - grafana-data:/var/lib/grafana
+
+  alertmanager:
+    image: prom/alertmanager
+    restart: unless-stopped
+    ports:
+      - 9093:9093
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./alertmanager/alertmanager.yml:/config/alertmanager.yml
+    command: --config.file=/config/alertmanager.yml --log.level=debug
+
+
+volumes:
+  prometheus-data:
+  grafana-data:
+  alertmanager-data:
