@@ -33,9 +33,9 @@ Our container is hosted on [dockerhub](https://hub.docker.com/r/sergiocaputoo/vi
 ### Run container
 It is preferable to run the container with a GPU, but if you don't have one, you can run it with a CPU without problems.
 #### Run on CPU
-```docker run -it --name visdrone_cpu -p 8000:8000 visdrone```
+```docker run -it --name visdrone_cpu -p 8000:8000 sergiocaputoo/visdrone```
 #### Run on GPU
-```docker run -it --name visdrone_cuda -p 8000:8000 --gpus all visdrone```
+```docker run -it --name visdrone_cuda -p 8000:8000 --gpus all sergiocaputoo/visdrone```
 
 ## Run locally
 ### Requirements
