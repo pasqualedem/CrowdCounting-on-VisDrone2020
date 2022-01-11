@@ -8,7 +8,7 @@ The API is accessible at the following endpoints:
 - `/` which gives a welcome message
 - `/docs` which provides a documentation of the API
 - `/predictions/images` used to receive prediction for a given image
-- - `/predictions/videos` used to receive prediction for a given video
+- `/predictions/videos` used to receive prediction for a given video
 
 ## Request of prediction
 The request is made by passing:
