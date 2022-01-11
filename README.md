@@ -44,6 +44,9 @@ It is preferable to run the container with a GPU, but if you don't have one, you
 
 ## Run locally without docker
 ### Requirements
+- python 3.9
+- [ffmpeg](https://www.ffmpeg.org/)
+
 If you just want to run the api:
 ```bash
 pip install -r requirements.txt
