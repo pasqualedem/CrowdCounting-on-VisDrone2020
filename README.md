@@ -21,23 +21,28 @@ curl -X 'POST' \
   'http://www.drone-crowdcounting.com/predictions/images?count=true&heatmap=true' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'file=@00029.jpg;type=image/jpeg'
+  -F 'file=@<filename.format>;type=image/jpeg'
 ```
 
 ## Container
-### Pull docker container
+### Pull and run docker container
 Our container is hosted on [dockerhub](https://hub.docker.com/r/sergiocaputoo/visdrone):
 
 `docker pull sergiocaputoo/visdrone`
 
-### Run container
 It is preferable to run the container with a GPU, but if you don't have one, you can run it with a CPU without problems.
 #### Run on CPU
 ```docker run -it --name visdrone_cpu -p 8000:8000 sergiocaputoo/visdrone```
 #### Run on GPU
 ```docker run -it --name visdrone_cuda -p 8000:8000 --gpus all sergiocaputoo/visdrone```
 
-## Run locally
+### Build and run docker container
+#### Run on CPU
+```/docker_scripts/api```
+#### Run on GPU
+```/docker_scripts/api_gpu```
+
+## Run locally without docker
 ### Requirements
 If you just want to run the api:
 ```bash
@@ -51,33 +56,29 @@ python src/api.py
 Those commands will run the api, which will accept requests on port 8000.
 
 
-## Prometheus
-```bash
-docker run -d -p 9090:9090 --add-host host.docker.internal:host-gateway \
-    -v "$PWD/prometheus.yml":/etc/prometheus/prometheus.yml \
-    --name=prometheus prom/prometheus
-```
+## Monitoring
+The backend is monitored by prometheus; a metric dashboard is exposed on grafana using prometheus as datasource.
+Also an alert manager is defined by prometheus that alerts on slack if the backend goes down.
 
-## Grafana
-```bash
-docker run -d -p 3000:3000 --add-host host.docker.internal:host-gateway \
-    --name=grafana grafana/grafana-enterprise
-```
+To run the monitoring suite:
+```/docker_scripts/monitoring```
 
 ## Locust
 ```bash
-locust -f tests/locust.py --host http://localhost:8000
+locust -f tests/load_tests/locustfile.py --host http://localhost:8000
 ```
 
 ## PyTest
 To run pytest without gpu:
 
 ```bash
+$env:PYTHONPATH = "src"
 PYTHONPATH=src pytest -m "not gpu" --cov src tests/
 ```
 
 To run pytest with gpu:
 ```bash
+$env:PYTHONPATH = "src"
 PYTHONPATH=src pytest --cov src tests/
 ```
 
@@ -87,3 +88,11 @@ cd tests/great_expectations/checkpoints
 great_expectations --v3-api checkpoint run complete_data.yml
 done
 ```
+## Frontend
+Our simple material design frontend is developed with angular, and hosted on microsoft azure: 
+[frontend link](http://drone-crowdcounting.com/)
+
+![frontend](https://user-images.githubusercontent.com/38686676/148965188-d3564ec7-5a5d-4b6d-84fb-b28b08376baf.png)
+
+The source code can be found on github:
+[frontend repository](https://github.com/MauroCamporeale/dronecrowd-wa)
