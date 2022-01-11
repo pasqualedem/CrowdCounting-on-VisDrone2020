@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  api:
+    build: . 
+    ports:
+      - 8000:8000
+    container_name: visdrone_gpu
+    ipc: "host"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
