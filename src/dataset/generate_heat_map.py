@@ -121,7 +121,7 @@ def load_yaml_prepare_params():
     return prepare_params, global_params
 
 
-if __name__ == '__main__':
+def main():
     train_rule = lambda x: '.txt' in x and 'test' not in x
     test_rule = lambda x: '_test.txt' in x
 
@@ -148,3 +148,7 @@ if __name__ == '__main__':
                      prepare_params,
                      *test)
     print('Successfully completed!')
+
+
+if __name__ == '__main__':
+    main()
