@@ -73,13 +73,13 @@ To run pytest without gpu:
 
 ```bash
 $env:PYTHONPATH = "src"
-PYTHONPATH=src pytest -m "not gpu" --cov src tests/
+pytest -m "not gpu" --cov src tests/
 ```
 
 To run pytest with gpu:
 ```bash
 $env:PYTHONPATH = "src"
-PYTHONPATH=src pytest --cov src tests/
+pytest --cov src tests/
 ```
 
 ## Great Expectations
