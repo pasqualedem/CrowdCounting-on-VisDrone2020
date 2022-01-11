@@ -163,15 +163,15 @@ def load_train_val():
     return train_loader, val_loader
 
 
-def generate_validation():
-    import os
-    import numpy as np
-    import shutil
-    np.random.seed(cfg.SEED)
-    source = "../../dataset/VisDrone2020-CC/train"
-    target = "../val"
-    os.chdir(source)
-    l = os.listdir()
-    val = np.random.choice(l, 16, replace=False)  # 16 is the 0.20 of the training set
-    for file in val:
-        shutil.move(os.path.join('./', file), os.path.join(target, file))
+# def generate_validation():
+#     import os
+#     import numpy as np
+#     import shutil
+#     np.random.seed(cfg.SEED)
+#     source = "../../dataset/VisDrone2020-CC/train"
+#     target = "../val"
+#     os.chdir(source)
+#     l = os.listdir()
+#     val = np.random.choice(l, 16, replace=False)  # 16 is the 0.20 of the training set
+#     for file in val:
+#         shutil.move(os.path.join('./', file), os.path.join(target, file))

@@ -44,3 +44,9 @@ class TestGenerateHeatmap:
         assert set(heatmaps.keys()) == set(df['frame'])  # Check it generated all the heatmaps
         for key in heatmaps.keys():
             (heatmaps[key] > 0).all()  # Heatmaps values are always greater than 0
+
+    @pytest.mark.prepare
+    @pytest.mark.slow
+    def test_main(self):
+        # For main it is sufficient to check that ends without errors
+        ghm.main()
