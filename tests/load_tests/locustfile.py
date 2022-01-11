@@ -45,16 +45,6 @@ class DroneUser(HttpUser):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.runs = int(np.random.exponential(EXP_SCALE) + 1)
-        self.cur_runs = 0
-
-    def check_stop(self):
-        """
-        Checks if user has finished its tasks, and then stops it
-        """
-        self.cur_runs += 1
-        if self.cur_runs == self.runs:
-            self.stop()
 
     @task(1)
     def root(self):
@@ -73,7 +63,6 @@ class DroneUser(HttpUser):
             ('file', ('img.jpg', img_bytes, 'image/jpeg'))
         ]
         self.client.post(url, headers={}, data={}, files=files)
-        self.check_stop()
 
     @task(4)
     @tag("prediction", 'video')
@@ -86,7 +75,6 @@ class DroneUser(HttpUser):
             ]
             self.client.post(url, headers={}, data={}, files=files)
         os.remove(video_path)
-        self.check_stop()
 
 
 def get_random_params():
