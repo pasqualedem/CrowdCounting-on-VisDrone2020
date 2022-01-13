@@ -1,4 +1,4 @@
-great_expecations
+great_expectations
 pytest
 pytest-cov
 locust

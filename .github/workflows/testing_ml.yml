@@ -1,4 +1,4 @@
-name: Testing
+name: Testing_ml
 
 on:
   pull_request:
@@ -6,7 +6,8 @@ on:
   workflow_dispatch:
 jobs:
 
-  test:
+  test_metrics:
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'new model') }}
     runs-on: ubuntu-latest
     env:
       OS: ubuntu-latest
@@ -23,17 +24,17 @@ jobs:
         python-version: 3.9
     - name: Install dependecies
       run: |
-        pip install -r requirements.txt
+        pip install -r requirements_test.txt
         pip install dvc[gdrive]
     - name: DVC pull
       env:
           GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS }}
       run: |
-        dvc pull dataset
         dvc pull exp/train/model.pth
-    - name: Generate Report
+    - name: Test metrics
+      env:
+        GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS }}
       run: |
-        pip install pytest pytest-cov 
-        PYTHONPATH='src' pytest --cov src tests/ -m "not (cuda or video or h5 or ml)" --cov-report=xml
-    - name: Codecov
-      uses: codecov/codecov-action@v2.1.0
+        PYTHONPATH='src' pytest -m "ml" tests/test_ml.py
+        cp exp/train/model.pth exp/model.pth
+        dvc push exp/model.pth
