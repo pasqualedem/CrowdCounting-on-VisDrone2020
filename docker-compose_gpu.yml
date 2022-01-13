@@ -6,7 +6,6 @@ services:
     ports:
       - 8000:8000
     container_name: visdrone_gpu
-    ipc: "host"
     deploy:
       resources:
         reservations:
