@@ -28,5 +28,5 @@ def test_metrics():
 
         for metric in MIN_METRICS:
             print("new: {} old: {}".format(metrics[metric], deployed_metrics[metric]))
-            assert metrics[metric] >= deployed_metrics[metric]
+            assert metrics[metric] <= deployed_metrics[metric]
 
