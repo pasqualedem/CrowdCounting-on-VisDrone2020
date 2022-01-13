@@ -32,7 +32,9 @@ jobs:
       run: |
         dvc pull exp/train/model.pth
     - name: Test metrics
+      env:
+        GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS }}
       run: |
         PYTHONPATH='src' pytest -m "ml" tests/test_ml.py
         cp exp/train/model.pth exp/model.pth
-        dvc push exp/model.pth.dvc
+        dvc push exp/model.pth
