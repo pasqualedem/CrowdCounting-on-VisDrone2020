@@ -56,7 +56,6 @@ jobs:
       with:
           fetch-depth: 0
     - name: deploy
-    - uses: actions/checkout@master
       run: |
         docker login visdrone.azurecr.io -u 00000000-0000-0000-0000-000000000000 -p ${{ secrets.AZURE_TOKEN }}
         az acr import --name visdrone --source docker.io/sergiocaputoo/visdrone --image visdrone:latest
