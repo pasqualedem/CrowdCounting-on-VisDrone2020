@@ -33,6 +33,12 @@ jobs:
     - name: Generate Report
       run: |
         pip install pytest pytest-cov 
-        PYTHONPATH='src' pytest --cov src tests/ -m "not (cuda or video or h5)" --cov-report=xml
+        PYTHONPATH='src' pytest --cov src tests/ -m "not (cuda or video or h5 or ml)" --cov-report=xml
     - name: Codecov
       uses: codecov/codecov-action@v2.1.0
+    - name: Test metrics
+      if: ${{ contains(github.event.pull_request.labels.*.name, 'new model') }}
+      run: |
+        PYTHONPATH='src' pytest -m "ml" tests/
+        cp exp/train/model.pth exp/model.pth
+        dvc push exp/model.pth
