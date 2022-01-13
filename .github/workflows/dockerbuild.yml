@@ -58,9 +58,7 @@ jobs:
     - name: login
       uses: azure/docker-login@v1
       with:
-        login-server: visdrone.azurecr.io
-        username: 00000000-0000-0000-0000-000000000000
-        password: ${{ secrets.AZURE_TOKEN }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
     - name: deploy
       run: |
         az acr import --name visdrone --source docker.io/sergiocaputoo/visdrone --image visdrone:latest
