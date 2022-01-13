@@ -3,6 +3,13 @@ name: Deploy
 on:
   push:
     branches: [ main ]
+    paths:
+      - "src/**"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "Pipfile"
+      - "metrics.json"
+      
   workflow_dispatch:
 
 jobs:
