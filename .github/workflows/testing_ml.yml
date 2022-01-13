@@ -35,4 +35,4 @@ jobs:
       run: |
         PYTHONPATH='src' pytest -m "ml" tests/test_ml.py
         cp exp/train/model.pth exp/model.pth
-        dvc push exp/model.pth
+        dvc push exp/model.pth.dvc
