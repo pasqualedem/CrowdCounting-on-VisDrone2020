@@ -66,6 +66,6 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: deploy
       run: |
-        az acr repository delete -n visdrone --repository visdrone
+        az acr repository delete -n visdrone --repository visdrone --yes
         az acr import --name visdrone --source docker.io/sergiocaputoo/visdrone --image visdrone:latest
         az container create -g visdrone -n visdrone --image sergiocaputoo/visdrone --port 80
