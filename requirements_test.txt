@@ -1,0 +1,4 @@
+great_expecations
+pytest
+pytest-cov
+locust
