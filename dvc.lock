@@ -39,15 +39,16 @@ stages:
       md5: ed59510ef682f1b43bfcee6b2665c378
       size: 53
   prepare:
-    cmd: python src/dataset/generate_heat_map.py
+    cmd: great_expectations --v3-api -c tests/great_expectations/great_expectations.yml
+      checkpoint run complete_data && python src/dataset/generate_heat_map.py
     deps:
     - path: dataset/VisDrone2020-CC/raw
       md5: 9737366fa86893699d5dfd518b8523dd.dir
       size: 1195186431
       nfiles: 3476
     - path: src/dataset/generate_heat_map.py
-      md5: bef9ae01688319349681888f4e5d5dc4
-      size: 5685
+      md5: c5887e62b9d4f7f1d3ccfb50e4ce2e0d
+      size: 5716
     params:
       params.yaml:
         global.DATA_PATH: dataset/VisDrone2020-CC
@@ -58,7 +59,7 @@ stages:
         prepare.GAMMA: 3
     outs:
     - path: dataset/VisDrone2020-CC/processed
-      md5: 9f28edd5dc4c48067d6d349044da6ccd.dir
+      md5: 2deee407dce519d21c3b354dd9328e26.dir
       size: 13941473280
       nfiles: 3360
   train:

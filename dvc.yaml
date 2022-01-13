@@ -1,7 +1,8 @@
 stages:
   # PREPARE PHASE
   prepare:
-    cmd: python src/dataset/generate_heat_map.py
+    cmd: great_expectations --v3-api -c tests/great_expectations/great_expectations.yml checkpoint run complete_data
+         && python src/dataset/generate_heat_map.py
     deps:
       - dataset/VisDrone2020-CC/raw
       - src/dataset/generate_heat_map.py
