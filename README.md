@@ -3,6 +3,24 @@
 *Counting system to estimate the number of people and density map in drone-captured images and videos*
 
 # Usage
+
+## Run an experiment
+### Requirements
+- python 3.9
+
+Install requirements:
+```bash
+pip install -r requirements.txt
+```
+Download the dataset
+```bash
+dvc pull dataset/Visdrone2020-CC/raw
+```
+Run an experiment with DVC
+```bash
+dvc exp run
+```
+
 ## API Endpoints
 The API is accessible at the following endpoints:
 - `/` which gives a welcome message
