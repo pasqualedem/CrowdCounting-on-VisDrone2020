@@ -33,6 +33,6 @@ jobs:
         dvc pull exp/train/model.pth
     - name: Test metrics
       run: |
-        PYTHONPATH='src' pytest -m "ml" tests/
+        PYTHONPATH='src' pytest -m "ml" tests/test_ml.py
         cp exp/train/model.pth exp/model.pth
         dvc push exp/model.pth
