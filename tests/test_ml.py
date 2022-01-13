@@ -20,11 +20,13 @@ def test_metrics():
         assert MIN_METRICS[metric] > metrics[metric]
 
     os.system('wget {} -O {}'.format(GIT_METRICS_FILE, DEPLOYED_METRICS_FILE))
-
+    print('Going to test')
     if os.path.exists(DEPLOYED_METRICS_FILE):
+        print('Testing new metrics')
         with open(DEPLOYED_METRICS_FILE) as metrics_file:
             deployed_metrics = json.load(metrics_file)
 
         for metric in MIN_METRICS:
+            print("new: {} old: {}".format(metrics[metric], deployed_metrics[metric]))
             assert metrics[metric] >= deployed_metrics[metric]
 
