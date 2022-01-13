@@ -58,7 +58,7 @@ jobs:
     - name: login
       uses: azure/login@v1
       with: # Set Azure credentials secret as an input
-        credentials: ${{ secrets.AZURE_CREDENTIALS }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
     - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
