@@ -55,8 +55,13 @@ jobs:
       uses: actions/checkout@v2
       with:
           fetch-depth: 0
+    - name: login
+      uses: azure/docker-login@v1
+      with:
+        login-server: visdrone.azurecr.io
+        username: 00000000-0000-0000-0000-000000000000
+        password: ${{ secrets.AZURE_TOKEN }}
     - name: deploy
       run: |
-        docker login visdrone.azurecr.io -u 00000000-0000-0000-0000-000000000000 -p ${{ secrets.AZURE_TOKEN }}
         az acr import --name visdrone --source docker.io/sergiocaputoo/visdrone --image visdrone:latest
         az container create -g visdrone -n visdrone --image sergiocaputoo/visdrone --port 80
