@@ -2,4 +2,3 @@ great_expectations
 pytest
 pytest-cov
 locust
-json

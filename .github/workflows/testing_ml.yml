@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 jobs:
 
-  test:
+  test_metrics:
     if: ${{ contains(github.event.pull_request.labels.*.name, 'new model') }}
     runs-on: ubuntu-latest
     env:
