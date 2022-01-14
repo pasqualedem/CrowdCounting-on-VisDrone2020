@@ -1,0 +1,4 @@
+outs:
+- md5: a5380ccdc0ce774cf4089b552628884d
+  size: 10774895
+  path: all_ep_8_mae_14.3_rmse_18.1.pth

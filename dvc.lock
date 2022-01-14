@@ -1,0 +1,114 @@
+schema: '2.0'
+stages:
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: dataset/VisDrone2020-CC/processed
+      md5: 9f28edd5dc4c48067d6d349044da6ccd.dir
+      size: 13941473280
+      nfiles: 3360
+    - path: exp/train
+      md5: 8e247883947379035116637cfe6f2537.dir
+      size: 41135812
+      nfiles: 3
+    - path: src/dataset/visdrone.py
+      md5: 9b2101f75d0075ba93fa0166442c4538
+      size: 6592
+    - path: src/evaluate.py
+      md5: 02c0123b72c8ced116894819a6ab4742
+      size: 5323
+    params:
+      params.yaml:
+        evaluate.DEVICE: cuda
+        evaluate.LOSSES:
+        - rmse
+        - mae
+        evaluate.OUT_PREDICTIONS: true
+        evaluate.model.NET: MobileCount
+        evaluate.model.PRETRAINED: exp/train/model.pth
+        global.DATA_PATH: dataset/VisDrone2020-CC
+        global.SIZE:
+        - 540
+        - 960
+    outs:
+    - path: exp/eval
+      md5: 82b96ad111edcf9f3d4207828623b2d4.dir
+      size: 93632730
+      nfiles: 900
+    - path: metrics.json
+      md5: ed59510ef682f1b43bfcee6b2665c378
+      size: 53
+  prepare:
+    cmd: great_expectations --v3-api -c tests/great_expectations/great_expectations.yml
+      checkpoint run complete_data && python src/dataset/generate_heat_map.py
+    deps:
+    - path: dataset/VisDrone2020-CC/raw
+      md5: 9737366fa86893699d5dfd518b8523dd.dir
+      size: 1195186431
+      nfiles: 3476
+    - path: src/dataset/generate_heat_map.py
+      md5: c5887e62b9d4f7f1d3ccfb50e4ce2e0d
+      size: 5716
+    params:
+      params.yaml:
+        global.DATA_PATH: dataset/VisDrone2020-CC
+        global.SIZE:
+        - 540
+        - 960
+        prepare.FILENAME_LEN: 5
+        prepare.GAMMA: 3
+    outs:
+    - path: dataset/VisDrone2020-CC/processed
+      md5: 2deee407dce519d21c3b354dd9328e26.dir
+      size: 13941473280
+      nfiles: 3360
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: dataset/VisDrone2020-CC/processed
+      md5: 9f28edd5dc4c48067d6d349044da6ccd.dir
+      size: 13941473280
+      nfiles: 3360
+    - path: dataset/VisDrone2020-CC/raw
+      md5: 173410955693b84a33d3df753adce4b7.dir
+      size: 1148990226
+      nfiles: 3474
+    - path: src/dataset/visdrone.py
+      md5: 9b2101f75d0075ba93fa0166442c4538
+      size: 6592
+    - path: src/models
+      md5: 9a998756adf5c5638c4bc1693d3262d8.dir
+      size: 21321
+      nfiles: 7
+    - path: src/train.py
+      md5: 65369213d8cee1884ab72f124a12b1f3
+      size: 9347
+    params:
+      params.yaml:
+        global.DATA_PATH: dataset/VisDrone2020-CC
+        global.SIZE:
+        - 540
+        - 960
+        train.DETAILS: _dvc_try
+        train.EARLY_STOP_DELTA: 0.01
+        train.LR: 0.001
+        train.LR_DECAY: 0.995
+        train.LR_DECAY_START: 0
+        train.MAX_EPOCH: 1
+        train.MOMENTUM: 0.95
+        train.NUM_EPOCH_LR_DECAY: 1
+        train.OPTIM: Adam
+        train.PATIENCE: 20
+        train.TRAIN_BATCH_SIZE: 6
+        train.VAL_BATCH_SIZE: 6
+        train.VAL_DENSE_START: 1
+        train.VAL_FREQ: 10
+        train.VAL_SIZE: 0.2
+        train.W_DECAY: 0.0001
+        train.model.NET: MobileCount
+        train.model.PRETRAINED: None
+    outs:
+    - path: exp/train
+      md5: 8e247883947379035116637cfe6f2537.dir
+      size: 41135812
+      nfiles: 3

@@ -1,0 +1,4 @@
+outs:
+- md5: 79a54c76b723a3f913a49b60b9ebdf32
+  size: 10774895
+  path: all_ep_15_mae_12.2_rmse_15.9.pth

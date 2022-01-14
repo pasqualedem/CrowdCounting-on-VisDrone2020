@@ -1,0 +1,4 @@
+outs:
+- md5: d9a46d97c251224e2c68e85052d81195
+  size: 17100207
+  path: all_ep_31_mae_11.8_rmse_16.7.pth

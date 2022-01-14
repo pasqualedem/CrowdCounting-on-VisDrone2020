@@ -1,0 +1,4 @@
+outs:
+- md5: 98f17473a65e281b5f3ae5c76b30248f
+  size: 10774895
+  path: all_ep_43_mae_16.4_rmse_21.3.pth

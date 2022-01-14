@@ -1,0 +1,73 @@
+stages:
+  # PREPARE PHASE
+  prepare:
+    cmd: great_expectations --v3-api -c tests/great_expectations/great_expectations.yml checkpoint run complete_data
+         && python src/dataset/generate_heat_map.py
+    deps:
+      - dataset/VisDrone2020-CC/raw
+      - src/dataset/generate_heat_map.py
+    params:
+      - global.DATA_PATH
+      - global.SIZE
+      - prepare.FILENAME_LEN
+      - prepare.GAMMA
+    outs:
+      - dataset/VisDrone2020-CC/processed:
+          cache: false
+
+  # TRAIN PHASE
+  train:
+    cmd: python src/train.py
+    deps:
+      - dataset/VisDrone2020-CC/processed
+      - dataset/VisDrone2020-CC/raw
+      - src/dataset/visdrone.py
+      - src/models
+      - src/train.py
+    params:
+      - global.DATA_PATH
+      - global.SIZE
+      - train.DETAILS
+      - train.EARLY_STOP_DELTA
+      - train.LR
+      - train.LR_DECAY
+      - train.LR_DECAY_START
+      - train.MAX_EPOCH
+      - train.MOMENTUM
+      - train.NUM_EPOCH_LR_DECAY
+      - train.OPTIM
+      - train.PATIENCE
+      - train.TRAIN_BATCH_SIZE
+      - train.VAL_BATCH_SIZE
+      - train.VAL_DENSE_START
+      - train.VAL_FREQ
+      - train.VAL_SIZE
+      - train.W_DECAY
+      - train.model.NET
+      - train.model.PRETRAINED
+    outs:
+      - exp/train
+
+  # EVALUATE PHASE
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - dataset/VisDrone2020-CC/processed
+    - exp/train
+    - src/dataset/visdrone.py
+    - src/evaluate.py
+    params:
+    - evaluate.DEVICE
+    - evaluate.LOSSES
+    - evaluate.OUT_PREDICTIONS
+    - evaluate.model.NET
+    - evaluate.model.PRETRAINED
+    - global.DATA_PATH
+    - global.SIZE
+    outs:
+    - exp/eval
+    metrics:
+    - metrics.json:
+        cache: false
+
+
