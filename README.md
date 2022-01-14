@@ -1,4 +1,6 @@
-# Drone-CrowdCounting [![codecov](https://codecov.io/gh/se4ai2122-cs-uniba/Drone-CrowdCounting/branch/main/graph/badge.svg?token=WFM4DH44WF)](https://codecov.io/gh/se4ai2122-cs-uniba/Drone-CrowdCounting) ![Pylint Report](https://github.com/se4ai2122-cs-uniba/Drone-CrowdCounting/actions/workflows/linting.yml/badge.svg)
+# Drone-CrowdCounting 
+[![codecov](https://codecov.io/gh/pasqualedem/CrowdCounting-on-VisDrone2020/branch/main/graph/badge.svg?token=C9QW2GJ38Q)](https://codecov.io/gh/pasqualedem/CrowdCounting-on-VisDrone2020)
+![Pylint Report](https://github.com/se4ai2122-cs-uniba/Drone-CrowdCounting/actions/workflows/linting.yml/badge.svg)
 
 *Counting system to estimate the number of people and density map in drone-captured images and videos*
 
