@@ -29,8 +29,7 @@ jobs:
       env:
           GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS }}
       run: |
-        dvc pull dataset
-        dvc pull exp/train/model.pth
+        dvc pull
     - name: Generate Report
       run: |
         pip install pytest pytest-cov 
